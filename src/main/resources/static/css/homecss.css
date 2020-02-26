@@ -1,0 +1,33 @@
+select{
+    /* 去掉三角 */
+    margin-left: 10px;
+    margin-top: 15px;
+    appearance: none;
+    -moz-appearance: none; /* Firefox */
+    -webkit-appearance: none; /* Safari 和 Chrome */
+    /* 去掉边框 */
+    border: 1px solid #5cb85c;
+    width: 13%;
+    height: 34px; display : block;
+    position: relative;
+    float: left;
+    display: block;
+}
+.layui-btn{
+    margin-top: 15px;
+    margin-left: 10px;
+    width: 13%;
+    height: 34px;
+}
+#kk{
+    margin-top: 55px;
+}
+#iframee{
+    margin-top: 60px;
+}
+#formid{
+    width: 100%;
+}
+#left{
+    width: 100%;
+}

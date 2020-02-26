@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="js/echarts.js" ></script>
+		<script type="text/javascript" src="js/china.js" ></script>
+		<script type="text/javascript" src="js/guizhou.js" ></script>
+	</head>
+	<body>
+		<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+		<div id="echartMap" style="width: 100%; height: 900px;"></div>
+		<script>
+		var ac = [
+		    {
+		        "name": "蘑菇1",
+		        "value": [107.615944, 27.479744, 200]
+		    },
+		    {
+		        "name": "蘑菇1",
+		        "value": [108.296644, 27.676476, 100]
+		    }
+		]
+		var ac2 = [
+		    {
+		        "name": "蘑菇2",
+		        "value": [108.615944, 27.479744, 200]
+		    },
+		    {
+		        "name": "蘑菇2",
+		        "value": [109.296644, 27.676476, 100]
+		    }
+		]
+		var ac3 = [
+		    {
+		        "name": "蘑菇3",
+		        "value": [106.615944, 27.479744, 200]
+		    },
+		    {
+		        "name": "蘑菇3",
+		        "value": [105.296644, 27.676476, 100]
+		    }
+		]
+		// 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('echartMap'));
+        var option = {
+	        	 tooltip: {
+	                show: true,
+	               // formatter: "名称:{b}<br />坐标:{c0}<br /> "
+	            	formatter:function(params,val){
+	            		return "名称:"+params.name +"\n"+ "值:"+params.value[2]
+	            	}
+	        	 },
+        		title:{
+        			text:'蘑菇菌种分布图',
+        			subtext:'纯属虚构',
+        			left:'center'
+        		},
+	        	
+	        	toolbox:{
+	        		show:true,
+	        		orient:'vertical',
+	        		top:'center',
+	        		feature:{
+	        			mark:{
+	        				show:true
+	        			},
+	        			dataView:{
+	        				show:true,
+	        				readOnly:true
+	        			},
+	        			restore:{
+	        				show:true
+	        			},
+	        			saveAsImage:{
+	        				show:true
+	        			}
+	        		}
+	        		
+	        	},
+	        	series:[{
+						name:'菌种分布位置',
+						type:'effectScatter',
+						coordinateSystem:'geo',
+						zlevel:2,
+						z:1,
+						rippleEffect: {
+                        	brushType: 'stroke'
+	                    },
+	                    label: {
+	                        emphasis: {
+	                            show: true,
+	                            position: 'right',
+	                            formatter: '{b}'
+	                        }
+	                    },
+	                    symbolSize: function (val) {
+			                return val[2] / 10;
+			            },
+	                    showEffectOn: 'render',
+	                    itemStyle: {
+	                        normal: {
+	                            color: '#46bee9'
+	                        }
+	                    },
+	                    data: ac
+							
+		        		},
+		        		{
+						name:'蘑菇2',
+						type:'effectScatter',
+						coordinateSystem:'geo',
+						z:2,
+						rippleEffect: {
+                       		 brushType: 'stroke'
+	                    },
+	                    label: {
+	                        emphasis: {
+	                            show: true,
+	                            position: 'right',
+	                            formatter: '{b}'
+	                        }
+	                    },
+	                    symbolSize: function (val) {
+			                return val[2] / 10;
+			            },
+	                    showEffectOn: 'render',
+	                    itemStyle: {
+	                        normal: {
+	                            color: '#46bee9'
+	                        }
+	                    },
+	                    data: ac2
+							
+		        		},
+		        		{
+		        			name:"自定义图标",
+		        			type:'custom',
+		        			coordinateSystem:'geo',
+		        			rippleEffect: {
+                       		 brushType: 'stroke'
+	                    	},
+		        			itemStyle:{
+		        				normal:{
+		        					color:"#46bee9"
+		        				}
+		        			},
+		        			renderItem:function(params,api){
+		        				return{
+		        					type:'image',
+		        					style:{
+		        						image:"img/mogu.jpg",
+		        						width:ac3[params.dataIndex].value[2] / 10,
+		        						height:ac3[params.dataIndex].value[2] / 10,
+		        						x:api.coord([
+		        							ac3[params.dataIndex].value[0],ac3[params.dataIndex].value[1]
+		        						])[0],
+		        						y:api.coord([
+		        							ac3[params.dataIndex].value[0],ac3[params.dataIndex].value[1]
+		        						])[1],
+		        					},
+		        					
+		        				}
+		        				
+		        			},
+		        			
+		        			data:ac3
+		        		}
+	        	],
+	        	legend:{
+	        		    type: "plain",
+		                show: true,
+		                orient: 'vertical',
+		                top: 'middle',
+		                left: 'left',
+		                data: [
+		                    {
+		                        name: "菌种分布位置",
+		                        icon: "circle",
+		                        textStyle: {
+		                            color: "#a9d6fa"
+		                        }
+		                    },
+		                     {
+		                        name: "蘑菇2",
+		                        icon: "circle",
+		                        textStyle: {
+		                            color: "#a9d6fa"
+		                        }
+		                    },{
+		                        name: "自定义图标",
+		                        icon: "circle",
+		                        textStyle: {
+		                            color: "#a9d6fa"
+		                        }
+		                    }
+		                    
+		                ]
+	        	},
+	        	geo: {
+		            type: 'map',
+		            map: '贵州',
+		            label: {
+		            	normal:{
+		            		show:true,
+		            		textStyle: {color: '#fff'},
+		            		borderColor: 'rgba(100,149,237,1)',
+			                borderWidth: 0.5,
+			                areaStyle: {
+			                    color: '#1b1b1b'
+			                }
+			              },
+	                    emphasis: {
+	                        show: false
+	                    }
+	                },
+	                roam: true,
+	                zoom: 1,
+	                itemStyle: {
+	                    normal: {
+	        
+	                        borderColor: '#387ba7',
+	                        shadowColor: 'rgba(0, 0, 0, 0.5)',
+	                        shadowBlur: 10,
+	                        shadowOffsetX: 10
+	                    },
+	                    emphasis: {
+	                        areaColor: '#b3f3f3'
+	                    }
+                },
+                regions: [//对不同的区块进行着色
+                    {
+                        name: '毕节市',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#2b97df',
+                                name:name
+                            }
+                        }
+                    }, {
+                        name: '遵义市',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#a9d6fd'
+                            }
+                        }
+                    }, {
+                        name: '铜仁市',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#3497df'
+                            }
+                        }
+                    }, {
+                        name: '贵阳市',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#0d4369'
+                            }
+                        }
+                    }, {
+                        name: '安顺市',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#005c9b'
+                            }
+                        }
+                    }, {
+                        name: '黔西南布依族苗族自治州',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#a9d6fd'
+                            }
+                        }
+                    }, {
+                        name: '六盘水市',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#0d4369'
+                            }
+                        }
+                    }, {
+                        name: '黔东南苗族侗族自治州',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#005c9b'
+                            }
+                        }
+                    }, {
+                        name: '黔南布依族苗族自治州',
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#2b97df'
+                            }
+                        }
+                    }
+                ]
+	        	}
+        	}
+        myChart.setOption(option);
+        </script>
+	</body>
+</html>

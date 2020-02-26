@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+
+		<script type="text/javascript" src="/js/echarts.js" ></script>
+		<script type="text/javascript" src="/js/china.js" ></script>
+		<script type="text/javascript" src="/js/guizhou.js" ></script>
+		<script type="text/javascript" src="/js/function.js"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	</head>
+	<body>
+		<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+		<div id="echartMap" style="width: 100%; height: 900px;"></div>
+
+		<script>
+
+		// 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('echartMap'));
+        function load(myChart) {
+            $.ajax({
+				contentType:"application/json",
+				type:"GET",
+				url:"/list2",
+				dataType:"json",
+				success:function (data) {
+
+				    var servicedata=[];
+				    //
+				    for(var i=0;i<data.length;i++){
+
+				        var obj = new Object();
+				        obj.name = data[i].name;
+				        obj.value = [data[i].latitude,data[i].longitude,data[i].value];
+				        servicedata[i] = obj;
+					}
+                    var option = {
+                        tooltip: {
+                            show: true,
+                            // formatter: "名称:{b}<br />坐标:{c0}<br /> "
+                            formatter:function(params,val){
+                                return "名称:"+params.name +"\n"+ "值:"+params.value[2]
+                            }
+                        },
+                        title:{
+                            text:'蘑菇菌种分布图',
+                            subtext:'纯属虚构',
+                            left:'center'
+                        },
+
+                        toolbox:{
+                            show:true,
+                            orient:'vertical',
+                            top:'center',
+                            feature:{
+                                mark:{
+                                    show:true
+                                },
+                                dataView:{
+                                    show:true,
+                                    readOnly:true
+                                },
+                                restore:{
+                                    show:true
+                                },
+                                saveAsImage:{
+                                    show:true
+                                }
+                            }
+
+                        },
+                        series:series(servicedata),
+                        legend: {
+                            type: "plain",
+                            show: true,
+                            orient: 'vertical',
+                            top: 'middle',
+                            left: 'left',
+                            data: lengend(servicedata)
+
+                        },
+                        geo: {
+                            type: 'map',
+                            map: '贵州',
+                            label: {
+                                normal:{
+                                    show:true,
+                                    textStyle: {color: '#fff'},
+                                    borderColor: 'rgba(100,149,237,1)',
+                                    borderWidth: 0.5,
+                                    areaStyle: {
+                                        color: '#1b1b1b'
+                                    }
+                                },
+                                emphasis: {
+                                    show: false
+                                }
+                            },
+                            roam: true,
+                            zoom: 1,
+                            itemStyle: {
+                                normal: {
+
+                                    borderColor: '#387ba7',
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 10
+                                },
+                                emphasis: {
+                                    areaColor: '#b3f3f3'
+                                }
+                            },
+                            regions: [//对不同的区块进行着色
+                                {
+                                    name: '毕节市',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#2b97df',
+                                            name:name
+                                        }
+                                    }
+                                }, {
+                                    name: '遵义市',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#a9d6fd'
+                                        }
+                                    }
+                                }, {
+                                    name: '铜仁市',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#3497df'
+                                        }
+                                    }
+                                }, {
+                                    name: '贵阳市',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#0d4369'
+                                        }
+                                    }
+                                }, {
+                                    name: '安顺市',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#005c9b'
+                                        }
+                                    }
+                                }, {
+                                    name: '黔西南布依族苗族自治州',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#a9d6fd'
+                                        }
+                                    }
+                                }, {
+                                    name: '六盘水市',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#0d4369'
+                                        }
+                                    }
+                                }, {
+                                    name: '黔东南苗族侗族自治州',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#005c9b'
+                                        }
+                                    }
+                                }, {
+                                    name: '黔南布依族苗族自治州',
+                                    itemStyle: {
+                                        normal: {
+                                            areaColor: '#2b97df'
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                    myChart.setOption(option);
+                }
+			})
+
+        }
+        load(myChart);
+
+        </script>
+	</body>
+</html>

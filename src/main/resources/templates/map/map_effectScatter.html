@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html style="height: 100%" xmlns:th="http://www.w3.org/1999/xhtml">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+       <div id="container" style="height: 100%">
+
+       </div>
+       <link rel="stylesheet" href="/layui/css/layui.css"/>
+       <script type="text/javascript" src="/layui/layui.js"></script>
+       <script type="text/javascript" src="/js/jquery-3.1.1.min.js"></script>
+       <script type="text/javascript" src="/js/echarts.js"></script>
+       <script type="text/javascript" src="/js/bmap.min.js"></script>
+       <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=Xg3x1KqgrWNnFox4cGPW739h0Bt6rab1&__ec_v__=20190126"></script>
+       <input id="funginame" type="hidden" th:value="${name}">
+
+       <script type="text/javascript">
+
+            var dom = document.getElementById("container");
+            var myChart = echarts.init(dom);
+            var funginame = $("#funginame").val();
+
+            function load(mychart) {
+                $.ajax({
+                    contentType:"application/json",
+                    type:"GET",
+                    url:"/oneScatter/"+funginame,
+                    dataType:"json",
+                    success:function (data) {
+                        var app = {};
+                        var COLORS = ["#70b4eb" , "#1482e5","#1c3fbf", "#070093"];
+                        option = null;
+                        var servicedata=[];
+                        for(var i=0;i<data.length;i++){
+
+                            var obj = new Object();
+
+                            obj.name = data[i].genus1;
+
+                            obj.value = [data[i].longitude,data[i].latitude,data[i].value];
+                            obj.img = data[i].img;
+                            servicedata[i] = obj;
+                        }
+                        // var data = [
+                        //     {
+                        //         name: "蘑菇1",
+                        //         value: [107.615944, 27.479744, 2000]
+                        //     },
+                        //     {
+                        //         name: "蘑菇1",
+                        //         value: [108.296644, 27.676476, 1000]
+                        //     }
+                        // ];
+                        option = {
+                            title: {
+                                text: '菌种分布图',
+
+                                left: 'center'
+                            },
+                            tooltip : {
+                                trigger: 'item',
+                                show: true,
+                                // formatter: "名称:{b}<br />坐标:{c0}<br /> "
+                                formatter:function(params,val){
+                                    return "种类:"+params.name+"  经度:"+params.value[0]+"\n"+"纬度:"+params.value[1] +"\n"
+                                }
+                            },
+                            visualMap: {
+                                left: 'right',
+                                min: 0,
+                                max: 1,
+                                inRange: {
+                                    //color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                                    color:COLORS,
+                                    opacity: 0.3
+                                },
+                                text:['High','Low'],           // 文本，默认为数值文本
+                                calculable: true
+
+                                //	        inRange: {
+                                //	            color: COLORS,
+                                //	            opacity: 0.7
+                                //	        }
+                            },
+                            toolbox:{
+                                show:true,
+                                orient:'vertical',
+                                top:'center',
+                                feature:{
+                                    mark:{
+                                        show:true
+                                    },
+                                    dataView:{
+                                        show:true,
+                                        readOnly:true
+                                    },
+                                    restore:{
+                                        show:true
+                                    },
+                                    saveAsImage:{
+                                        show:true
+                                    }
+                                }
+
+                            },
+                            bmap: {
+                                center: [106.630905, 26.670379],
+                                zoom: 8,
+                                roam: true,
+                                // mapStyle: {
+                                //     styleJson: [{
+                                //         'featureType': 'water',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'color': '#d1d1d1'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'land',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'color': '#f3f3f3'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'railway',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'visibility': 'off'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'highway',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'color': '#fdfdfd'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'highway',
+                                //         'elementType': 'labels',
+                                //         'stylers': {
+                                //             'visibility': 'off'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'arterial',
+                                //         'elementType': 'geometry',
+                                //         'stylers': {
+                                //             'color': '#fefefe'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'arterial',
+                                //         'elementType': 'geometry.fill',
+                                //         'stylers': {
+                                //             'color': '#fefefe'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'poi',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'visibility': 'off'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'green',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'visibility': 'off'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'subway',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'visibility': 'off'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'manmade',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'color': '#d1d1d1'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'local',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'color': '#d1d1d1'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'arterial',
+                                //         'elementType': 'labels',
+                                //         'stylers': {
+                                //             'visibility': 'off'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'boundary',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'color': '#fefefe'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'building',
+                                //         'elementType': 'all',
+                                //         'stylers': {
+                                //             'color': '#d1d1d1'
+                                //         }
+                                //     }, {
+                                //         'featureType': 'label',
+                                //         'elementType': 'labels.text.fill',
+                                //         'stylers': {
+                                //             'color': '#999999'
+                                //         }
+                                //     }]
+                                // }
+                            },
+                            series : [
+                                {
+                                    name: 'pm2.5',
+                                    type: 'scatter',
+                                    coordinateSystem: 'bmap',
+                                    data: servicedata,
+                                    symbolSize: function (val) {
+                                        return val[2]*10;
+                                    },
+                                    label: {
+                                        normal: {
+                                            formatter: '{b}',
+                                            position: 'right',
+                                            show: false
+                                        },
+                                        emphasis: {
+                                            show: true
+                                        }
+                                    },
+                                    //          itemStyle: {
+                                    //              normal: {
+                                    //                  color: 'purple'
+                                    //              }
+                                    //          }
+                                    itemStyle: {
+                                        emphasis: {
+                                            color: 'yellow'
+                                        }
+                                    },
+                                }
+                                //      {
+                                //          name: 'Top 5',
+                                //          type: 'effectScatter',
+                                //          coordinateSystem: 'bmap',
+                                //          data: convertData(data.sort(function (a, b) {
+                                //              return b.value - a.value;
+                                //          }).slice(0, 6)),
+                                //          symbolSize: function (val) {
+                                //              return val[2] / 10;
+                                //          },
+                                //          showEffectOn: 'render',
+                                //          rippleEffect: {
+                                //              brushType: 'stroke'
+                                //          },
+                                //          hoverAnimation: true,
+                                //          label: {
+                                //              normal: {
+                                //                  formatter: '{b}',
+                                //                  position: 'right',
+                                //                  show: true
+                                //              }
+                                //          },
+                                //          itemStyle: {
+                                //              normal: {
+                                //                  color: 'purple',
+                                //                  shadowBlur: 10,
+                                //                  shadowColor: '#333'
+                                //              }
+                                //          },
+                                //          zlevel: 1
+                                //      }
+                            ]
+                        };
+                        if (option && typeof option === "object") {
+                            myChart.setOption(option, true);
+                        }
+                        myChart.on('click',function (params) {
+
+                            var longitude = params.data.value[0]
+                            var latitude = params.data.value[1]
+                            var name = params.data.name
+                            layui.use('layer',function(){
+                                var layer = layui.layer;
+
+                                $.ajax({
+                                    contentType:"application/json",
+                                    type:"GET",
+                                    url:"/getphotos_all",
+                                    data:{
+                                        "longitude":longitude,
+                                        "latitude":latitude,
+                                        "name":name
+                                    },
+                                    dataType:"json",
+                                    success:function (data) {
+                                        layer.photos({
+                                            photos:data,
+                                            anim:5
+                                        });
+                                    }
+                                })
+                                // $.getJSON('/getphotos',function (json) {
+                                //     alert(json)
+                                //     layer.photos({
+                                //         photos:json,
+                                //         anim:5
+                                //     });
+                                // });
+                            })
+                        });
+                        var bmap = myChart.getModel().getComponent('bmap').getBMap();
+                        var cityName = '贵州省'
+                        bmap.centerAndZoom(cityName,8);
+                        bmap.addControl(new BMap.OverviewMapControl());              //添加缩略地图控件
+                        bmap.enableScrollWheelZoom();
+                        bmap.addControl(new BMap.NavigationControl({ type: BMAP_NAVIGATION_CONTROL_LARGE ,anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMap.Size(40, 250)}));
+                        bmap.setMinZoom(8);
+                        bmap.setMaxZoom(20);
+                        var bdary = new BMap.Boundary();
+                        bdary.get(cityName, function (rs) {       //获取行政区域
+                           // bmap.clearOverlays();        //清除地图覆盖物
+
+                            //for循环都删除掉了，只剩下这个
+                            //网上查了下，东西经南北纬的范围
+                            var EN_JW = "180, 90;";         //东北角
+                            var NW_JW = "-180,  90;";       //西北角
+                            var WS_JW = "-180, -90;";       //西南角
+                            var SE_JW = "180, -90;";        //东南角
+                            //4.添加环形遮罩层
+
+                            var ply1 = new BMap.Polygon(rs.boundaries[1] + SE_JW + SE_JW + WS_JW + NW_JW + EN_JW + SE_JW, { strokeColor: "none", fillColor: "rgb(246,246,246)", fillOpacity:1, strokeOpacity: 0.5 }); //建立多边形覆盖物
+
+                            bmap.addOverlay(ply1);
+                            //5. 给目标行政区划添加边框，其实就是给目标行政区划添加一个没有填充物的遮罩层
+                            var ply = new BMap.Polygon(rs.boundaries[1], { strokeWeight: 2, strokeColor: "#00f",fillColor: "" });
+                            bmap.addOverlay(ply);
+                            //map.setViewport(ply.getPath());    //调整视野
+
+                        });
+
+                    }
+
+                })
+
+            }
+        load(myChart);
+       </script>
+
+   </body>
+</html>
