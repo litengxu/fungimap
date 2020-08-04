@@ -1,5 +1,6 @@
 package com.guizhou.map.service.serviceimpl;
 
+import com.guizhou.map.common.domain.baseconfig;
 import com.guizhou.map.dao.idtoimgMapper;
 import com.guizhou.map.domain.idtoimg;
 import com.guizhou.map.service.IdtoimgService;
@@ -13,6 +14,8 @@ import java.util.List;
 public class IdtoimgServiceImpl implements IdtoimgService {
     @Autowired
     private idtoimgMapper idtoimgMapper;
+//    private String imgurl = baseconfig.getImgurl();
+    private String imgurl = "http://gzbdi-yunshu.oss-cn-beijing.aliyuncs.com/";
 
     @Override
     public List<idtoimg> getall() {
@@ -34,7 +37,8 @@ public class IdtoimgServiceImpl implements IdtoimgService {
         StringBuffer sb = new StringBuffer();
         int count = 0;
         for (int i = 0; i < list3.size(); i++) {
-            sb.append("{\"alt\":\"" + name + "\",\"pid\":" + count + ",\"src\":\"https://yunshu-gzbdi.oss-cn-beijing.aliyuncs.com/" + list3.get(i).getRefid() + "\",\"thumb\":\"https://yunshu-gzbdi.oss-cn-beijing.aliyuncs.com/" + list3.get(i).getRefid() + "\"}");
+
+            sb.append("{\"alt\":\"" + name + "\",\"pid\":" + count + ",\"src\":\""+ imgurl + list3.get(i).getRefid() + "\",\"thumb\":\""+imgurl+ list3.get(i).getRefid() + "\"}");
             count++;
             if (i != list3.size() - 1) {
                 sb.append(",");

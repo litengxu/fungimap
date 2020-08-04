@@ -26,7 +26,7 @@
                    var loading = layer.load(2, {
                        shade: [0.3, '#fff'] //0.1透明度的白色背景
                    });
-
+                   alert("开始")
                function load(mychart) {
                    var is30 = $("#is30").val();
 
@@ -39,37 +39,28 @@
                        contentType: "application/json",
                        type: "GET",
                        url: backurl,
-                       // dataType: "json",
+                       dataType: "json",
                        success: function (data) {
-
-                           // var data1 = data.list1;
-                           var idarr = data.idarr;
-                           var namearr = data.namearr;
-                           var shuarr = data.shuarr;
-                           var longitudearr = data.longitudearr;
-                           var latitudearr = data.latitudearr;
-                           var valuearr = data.valuearr;
+                           alert(data)
+                           var data1 = data.list1;
                            var app = {};
                            var COLORS = ["#70b4eb", "#1482e5", "#1c3fbf", "#070093"];
                            option = null;
                            var servicedata = [];
-                           for (var i = 0; i < idarr.length; i++) {
+                           for (var i = 0; i < data1.length; i++) {
 
                                var obj = new Object();
                                //具体的名字
 
                                //属
-                               obj.name = shuarr[i] + namearr[i];
-                               obj.objectid = idarr[i];
-                               obj.value = [longitudearr[i],latitudearr[i],valuearr[i]];
-                               // obj.name = data1[i].shorttext1567761455594 + data1[i].shorttext1567761353834;
-                               // obj.objectid = data1[i].id;
-                               // // obj.special_name = data1[i].shorttext1567761353834;
-                               // obj.value = [data1[i].shorttext1567760963892, data1[i].shorttext1567760966363, data1[i].value];
+
+                               obj.name = data1[i].shorttext1567761455594 + data1[i].shorttext1567761353834;
+                               obj.objectid = data1[i].id;
+                               // obj.special_name = data1[i].shorttext1567761353834;
+                               obj.value = [data1[i].shorttext1567760963892, data1[i].shorttext1567760966363, data1[i].value];
                                // obj.img = data1[i].img;
                                servicedata[i] = obj;
                            }
-
 
                            // var data = [
                            //     {

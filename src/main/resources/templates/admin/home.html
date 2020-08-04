@@ -23,9 +23,9 @@
                             <!--<div class="layui-input-inline">-->
                                 <select id="city" name="quiz1" onchange="setSecond(this.value)">
                                     <option value="">请选择市</option>
-                                    <option value="贵阳市">贵阳地区</option>
+                                    <option value="贵阳地区">贵阳地区</option>
                                     <option value="六盘水地区">六盘水地区</option>
-                                    <option value="遵义市">遵义地区</option>
+                                    <option value="遵义市">遵义市</option>
                                     <option value="安顺地区">安顺地区</option>
                                     <option value="毕节地区">毕节地区</option>
                                     <option value="铜仁地区">铜仁地区</option>
@@ -105,19 +105,26 @@
             <ul class="layui-nav layui-nav-tree"  lay-filter="test" id = "kk">
                 <li class="layui-nav-item layui-nav-itemed">
                     <a class="" href="javascript:;">单一菌种</a>
-                    <dl class="layui-nav-child">
-                        <li class="layui-nav-item">
+
                             <tr th:each="u : ${funginamelist}">
-                                <a href="javascript:;"><td th:text="${u.genus1}"></td></a>
                                 <dl class="layui-nav-child">
-                                    <dd><a th:href="@{'/map-effectScatter/'+${u.genus1}}" target="voiceList">散点图</a></dd>
-                                    <dd><a th:href="@{'/map-zhu/'+${u.genus1}}" target="voiceList">分块图</a></dd>
-                                    <!--<dd><a th:href="@{https://www.baidu.com/}" target="voiceList">散点图</a></dd>-->
-
+                                <!--<li class="layui-nav-item">-->
+                                    <a href="javascript:;"th:id="${u.id}"><td th:text="${u.shorttext1567761455594}"></td></a>
+                                    <dl class="layui-nav-child" >
+                                        <dd><a th:href="@{'/map-effectScatter/'+${u.shorttext1567761455594}}" target="voiceList">散点图</a></dd>
+                                        <dd><a th:href="@{'/map-zhu/'+${u.shorttext1567761455594}}" target="voiceList">分块图</a></dd>
+                                        <!--<dd><a th:href="@{https://www.baidu.com/}" target="voiceList">散点图</a></dd>-->
+                                    </dl>
+                                <!--</li>-->
                                 </dl>
-
                             </tr>
-                        </li>
+
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">30种重点调查物种</a>
+                    <dl class="layui-nav-child">
+                        <dd><a th:href="@{/allFungi-zhu-30}" target="voiceList">分块图</a></dd>
+                        <dd><a th:href="@{/to30Scatter}" target="voiceList">散点图</a></dd>
                     </dl>
                 </li>
                 <li class="layui-nav-item">

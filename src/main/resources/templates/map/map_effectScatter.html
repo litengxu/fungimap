@@ -16,11 +16,14 @@
        <input id="funginame" type="hidden" th:value="${name}">
 
        <script type="text/javascript">
-
+           layui.use('layer',function() {
             var dom = document.getElementById("container");
             var myChart = echarts.init(dom);
             var funginame = $("#funginame").val();
-
+            layer.ready(function () {
+                var loading = layer.load(2, {
+                    shade: [0.3, '#fff'] //0.1透明度的白色背景
+                });
             function load(mychart) {
                 $.ajax({
                     contentType:"application/json",
@@ -36,10 +39,10 @@
 
                             var obj = new Object();
 
-                            obj.name = data[i].genus1;
-
-                            obj.value = [data[i].longitude,data[i].latitude,data[i].value];
-                            obj.img = data[i].img;
+                            obj.name = data[i].shorttext1567761455594 + data[i].shorttext1567761353834 ;
+                            obj.objectid = data[i].id;
+                            obj.value = [data[i].shorttext1567760963892,data[i].shorttext1567760966363,data[i].value];
+                            // obj.img = data[i].img;
                             servicedata[i] = obj;
                         }
                         // var data = [
@@ -274,11 +277,14 @@
                         if (option && typeof option === "object") {
                             myChart.setOption(option, true);
                         }
+                        layer.close(loading)
                         myChart.on('click',function (params) {
 
                             var longitude = params.data.value[0]
                             var latitude = params.data.value[1]
                             var name = params.data.name
+                            var objectid = params.data.objectid
+
                             layui.use('layer',function(){
                                 var layer = layui.layer;
 
@@ -289,7 +295,8 @@
                                     data:{
                                         "longitude":longitude,
                                         "latitude":latitude,
-                                        "name":name
+                                        "name":name,
+                                        "objectid":objectid
                                     },
                                     dataType:"json",
                                     success:function (data) {
@@ -343,7 +350,9 @@
                 })
 
             }
-        load(myChart);
+                load(myChart);
+            });
+           });
        </script>
 
    </body>

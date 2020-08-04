@@ -4,9 +4,12 @@ server:
 spring:
    datasource:
       url: jdbc:mysql://localhost:3306/fungimap?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false
+#      url: jdbc:mysql://114.55.145.179:3306/fungimap?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false
+
       username: root
+#      username: ltx
+#      password: 123456
       password: root
-      #password: root
       driver-class-name: com.mysql.cj.jdbc.Driver
 #    dbcp2:
 #      min-idle: 5
@@ -32,6 +35,13 @@ redis:
     redis:
       host: localhost
       port: 6379
+map:
+  imgurl: http://gzbdi-yunshu.oss-cn-beijing.aliyuncs.com/
+  kuaisize: 40
+  longitudemax: 109.672039
+  longitudemin: 103.299969
+  latitudemax: 29.443776
+  latitudemin: 24.191224
 
 
 

@@ -5,11 +5,16 @@
 </head>
 <body style="height: 100%; margin: 0">
 <!--margin-top:40px;width:1200px-->
-<input id="arr" type="hidden" th:value="${arr}">
+<!--<input id="arr" type="hidden" th:value="${arr}">-->
 <input id="citycountry" type="hidden" th:value="${citycountry}">
 <input id="zoom" type="hidden" th:value="${zoom}">
+<input id="city" type="hidden" th:value="${city}">
+<input id="country" type="hidden" th:value="${country}">
+<input id="datakind" type="hidden" th:value="${datakind}">
+<input id="funginame" type="hidden" th:value="${funginame}">
+
 <!--<input id="list" type="hidden" th:value="${list}">-->
-<input id="only" type="hidden" th:value="${only}">
+<!--<input id="only" type="hidden" th:value="${only}">-->
 <div id="container" style="height: 100%;"></div>
 
 <!--  <div id="zhuzhuang" ></div>-->
@@ -24,167 +29,190 @@
         var layer = layui.layer;
         var dom = document.getElementById("container");
         var myChart = echarts.init(dom);
-        var app = {};
-        var size = 40;
-        option = null;
-        var COLORS = ["#ffffff", "#b4e0f3","#70b4eb" , "#1482e5","#1c3fbf", "#070093","#000000"];
+        layer.ready(function() {
+            var loading = layer.load(2, {
+                shade: [0.3, '#fff'] //0.1透明度的白色背景
+            });
+
+            var city =  $("#city").val();
+            var country =  $("#country").val();
+            var funginame =  $("#funginame").val();
+            var datakind =  $("#datakind").val();
+            function load(mychart) {
+                $.ajax({
+                    type:"POST",
+                    url: "/map-kuai-ajax-sea",
+                    data:{
+                        "city":city,
+                        "country":country,
+                        "funginame":funginame,
+                        "datakind":datakind
+                    },
+                    traditional:true,
+                    // dataType: "json",
+                    success: function (data) {
+
+                        var app = {};
+                        var size = 40;
+                        option = null;
+                        var COLORS = ["#ffffff", "#b4e0f3","#70b4eb" , "#1482e5","#1c3fbf", "#070093","#000000"];
 //坐标为最大块正方形左下角和右上角
 //经度
-        var map = new BMap.Map("container");
-        var lngExtent = [24.191224, 30.563294];
+                        var map = new BMap.Map("container");
+                        var lngExtent = [24.191224, 30.563294];
 //纬度24.631894,103.622947
-        var latExtent = [103.299969,108.552521];
-        var cellCount = [size, size];
+                        var latExtent = [103.299969,108.552521];
+                        var cellCount = [size, size];
 
 //求得每块的经度纬度分别有多少度
-        var cellSizeCoord = [
-            (lngExtent[1] - lngExtent[0]) / cellCount[0],
-            (latExtent[1] - latExtent[0]) / cellCount[1]
-        ];
-        var gapSize = 0;
+                        var cellSizeCoord = [
+                            (lngExtent[1] - lngExtent[0]) / cellCount[0],
+                            (latExtent[1] - latExtent[0]) / cellCount[1]
+                        ];
+                        var gapSize = 0;
 //[列，行，值]
 
-        var data = $("#arr").val();
+                        // var data = $("#arr").val();
 
-        //使用split方法将字符串转换为一维数组，以;为分隔符
-        if(data){
-            var arr1 = data.split(";");//如果转成一维的，这里已经完成了，下面代码删除
-            //定义我们要存放数据的一维数组(实际上是二维数组，后面会转变，只不过js无法直接定义二维数组)
-        }
-        var arr2 = new Array(arr1.length);
-        //遍历一维数组，并将一维数组的值通过临时数组转移到二维数组里面
-        for (var i = 0; i < arr1.length; i++)
-        {
-            //定义临时数组
-            var temp =new Array(3);
-            //将一维数组再次拆分，准备存入二维数组
-            temp = arr1[i].split(",");
-            //定义将要存放数据的一维数组的每一个元素都为一个数组(实际上就是定义二维数组了)
-            arr2[i] = new Array(temp.length);
-            //遍历临时数组将其值存入二维数组
-            for (var j = 0; j < temp.length; j++)
-            {
-                arr2[i][j] = temp[j];//完成字符串转换为二维数组
-            };
-        };
-        // 下面是遍历二维数组，检测结果是否正确，实际使用中可以删除
-        data = arr2;
-
-
-        // for(var i = 0;i<data.length;i++){
-        //     alert(data[i][2]);
-        // }
-        function renderItem(params, api) {
-            var context = params.context;
-            //data集合中数组的第一个值和第二个值，表示第lngindex行第latindex列
-            var lngIndex = api.value(0);
-            var latIndex = api.value(1);
-            var coordLeftTop = [
-                //第n块左上角经度 = 初始经度+第n个格子*格子的的经度长
-                +(latExtent[0] + lngIndex * cellSizeCoord[0]).toFixed(6),
-                +(lngExtent[0] + latIndex * cellSizeCoord[1]).toFixed(6)
-            ];
-            //点的左上右下角坐标
-            var pointLeftTop = getCoord(params, api, lngIndex, latIndex);
-            var pointRightBottom = getCoord(params, api, lngIndex + 1, latIndex + 1);
-
-            return {
-                type: 'rect',
-                shape: {
-                    x: pointLeftTop[0],
-                    y: pointLeftTop[1],
-                    width: pointRightBottom[0] - pointLeftTop[0],
-                    height: pointRightBottom[1] - pointLeftTop[1]
-                },
-                style: api.style({
-                    stroke: 'rgba(0,0,0,0.1)'
-                }),
-                styleEmphasis: api.styleEmphasis()
-            };
-        }
-
-        function getCoord(params, api, lngIndex, latIndex) {
-            var coords = params.context.coords || (params.context.coords = []);
-            var key = lngIndex + '-' + latIndex;
-
-            // bmap returns point in integer, which makes cell width unstable.
-            // So we have to use right bottom point.
-            return coords[key] || (coords[key] = api.coord([
-                +(latExtent[0] + lngIndex * cellSizeCoord[0]).toFixed(6),
-                +(lngExtent[0] + latIndex * cellSizeCoord[1]).toFixed(6)
-            ]));
-        }
-
-        option = {
-
-            title: {
-                text: '菌种分布图',
-
-                left: 'center'
-            },
-            tooltip: {},
-
-            visualMap: {
-                left: 'right',
-                min: 0,
-                max: 50,
-                inRange: {
-                    //color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-                    color:COLORS,
-                    opacity: 0.6
-                },
-                text:['High','Low'],           // 文本，默认为数值文本
-                calculable: true
-
-
-            },
-            toolbox:{
-                show:true,
-                orient:'vertical',
-                top:'center',
-                feature:{
-                    mark:{
-                        show:true
-                    },
-                    dataView:{
-                        show:true,
-                        readOnly:true
-                    },
-                    restore:{
-                        show:true
-                    },
-                    saveAsImage:{
-                        show:true
-                    }
-                }
-
-            },
-            series: [
-                {
-                    type: 'custom',
-                    coordinateSystem: 'bmap',
-                    renderItem: renderItem,
-                    animation: false,
-                    itemStyle: {
-                        emphasis: {
-                            color: 'yellow'
+                        //使用split方法将字符串转换为一维数组，以;为分隔符
+                        if(data){
+                            var arr1 = data.split(";");//如果转成一维的，这里已经完成了，下面代码删除
+                            //定义我们要存放数据的一维数组(实际上是二维数组，后面会转变，只不过js无法直接定义二维数组)
                         }
-                    },
-                    encode: {
-                        tooltip: 2
-                    },
-                    data: data
-                }
-            ],
-            bmap: {
+                        var arr2 = new Array(arr1.length);
+                        //遍历一维数组，并将一维数组的值通过临时数组转移到二维数组里面
+                        for (var i = 0; i < arr1.length; i++)
+                        {
+                            //定义临时数组
+                            var temp =new Array(3);
+                            //将一维数组再次拆分，准备存入二维数组
+                            temp = arr1[i].split(",");
+                            //定义将要存放数据的一维数组的每一个元素都为一个数组(实际上就是定义二维数组了)
+                            arr2[i] = new Array(temp.length);
+                            //遍历临时数组将其值存入二维数组
+                            for (var j = 0; j < temp.length; j++)
+                            {
+                                arr2[i][j] = temp[j];//完成字符串转换为二维数组
+                            };
+                        };
+                        // 下面是遍历二维数组，检测结果是否正确，实际使用中可以删除
+                        data = arr2;
 
-                // center: [106.630905, 26.670379],
-                // zoom: 8,
-                roam: true,
+
+                        // for(var i = 0;i<data.length;i++){
+                        //     alert(data[i][2]);
+                        // }
+                        function renderItem(params, api) {
+                            var context = params.context;
+                            //data集合中数组的第一个值和第二个值，表示第lngindex行第latindex列
+                            var lngIndex = api.value(0);
+                            var latIndex = api.value(1);
+                            var coordLeftTop = [
+                                //第n块左上角经度 = 初始经度+第n个格子*格子的的经度长
+                                +(latExtent[0] + lngIndex * cellSizeCoord[0]).toFixed(6),
+                                +(lngExtent[0] + latIndex * cellSizeCoord[1]).toFixed(6)
+                            ];
+                            //点的左上右下角坐标
+                            var pointLeftTop = getCoord(params, api, lngIndex, latIndex);
+                            var pointRightBottom = getCoord(params, api, lngIndex + 1, latIndex + 1);
+
+                            return {
+                                type: 'rect',
+                                shape: {
+                                    x: pointLeftTop[0],
+                                    y: pointLeftTop[1],
+                                    width: pointRightBottom[0] - pointLeftTop[0],
+                                    height: pointRightBottom[1] - pointLeftTop[1]
+                                },
+                                style: api.style({
+                                    stroke: 'rgba(0,0,0,0.1)'
+                                }),
+                                styleEmphasis: api.styleEmphasis()
+                            };
+                        }
+
+                        function getCoord(params, api, lngIndex, latIndex) {
+                            var coords = params.context.coords || (params.context.coords = []);
+                            var key = lngIndex + '-' + latIndex;
+
+                            // bmap returns point in integer, which makes cell width unstable.
+                            // So we have to use right bottom point.
+                            return coords[key] || (coords[key] = api.coord([
+                                +(latExtent[0] + lngIndex * cellSizeCoord[0]).toFixed(6),
+                                +(lngExtent[0] + latIndex * cellSizeCoord[1]).toFixed(6)
+                            ]));
+                        }
+
+                        option = {
+
+                            title: {
+                                text: '菌种分布图',
+
+                                left: 'center'
+                            },
+                            tooltip: {},
+
+                            visualMap: {
+                                left: 'right',
+                                min: 0,
+                                max: 50,
+                                inRange: {
+                                    //color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                                    color:COLORS,
+                                    opacity: 0.6
+                                },
+                                text:['High','Low'],           // 文本，默认为数值文本
+                                calculable: true
 
 
-            }
-        };
+                            },
+                            toolbox:{
+                                show:true,
+                                orient:'vertical',
+                                top:'center',
+                                feature:{
+                                    mark:{
+                                        show:true
+                                    },
+                                    dataView:{
+                                        show:true,
+                                        readOnly:true
+                                    },
+                                    restore:{
+                                        show:true
+                                    },
+                                    saveAsImage:{
+                                        show:true
+                                    }
+                                }
+
+                            },
+                            series: [
+                                {
+                                    type: 'custom',
+                                    coordinateSystem: 'bmap',
+                                    renderItem: renderItem,
+                                    animation: false,
+                                    itemStyle: {
+                                        emphasis: {
+                                            color: 'yellow'
+                                        }
+                                    },
+                                    encode: {
+                                        tooltip: 2
+                                    },
+                                    data: data
+                                }
+                            ],
+                            bmap: {
+
+                                // center: [106.630905, 26.670379],
+                                // zoom: 8,
+                                roam: true,
+
+
+                            }
+                        };
 
 //	var ed;
 //  setTimeout(zhuZhuangTu(ed), 0);
@@ -236,259 +264,475 @@
 //	myChart.setOption(option);
 
 
-        // 点击显示柱状图
-        var index;
-        var data2 = []
-        myChart.on('click',function(e){
+                        // 点击显示柱状图
+                        layer.close(loading)
+                        var index;
+                        var data2 = []
+                        myChart.on('click',function(e){
 
-            // alert(e.data[0]);
-            // console.log(params);
-            // if(e.componentSubType == "bar"){
-            // 先清除所有柱状图
-            $('.tongJiTu').remove();
-            $('#zhuzhuang').remove();
-            $('.layui-layer').remove();
-            divObj = null;
-            index = null;
-            // 创建遮挡层
-            creatWrap();
-            // 创建柱状图容器
-            var divObj = document.createElement('div');
-            $("body").append(divObj);
-            //var divObj = document.getElementById('zhuzhuang');
-            $(divObj).addClass('tongJiTu');
-            divObj.id = 'zhuzhuang';
-            //alert($('#zhuzhuang'));
-            //alert(document.getElementById("zhuzhuang"));
-            //divObj.setAttribute('id','zhuzhuang');
+                            // alert(e.data[0]);
+                            // console.log(params);
+                            // if(e.componentSubType == "bar"){
+                            // 先清除所有柱状图
+                            $('.tongJiTu').remove();
+                            $('#zhuzhuang').remove();
+                            $('.layui-layer').remove();
+                            divObj = null;
+                            index = null;
+                            // 创建遮挡层
+                            creatWrap();
+                            // 创建柱状图容器
+                            var divObj = document.createElement('div');
+                            $("body").append(divObj);
+                            //var divObj = document.getElementById('zhuzhuang');
+                            $(divObj).addClass('tongJiTu');
+                            divObj.id = 'zhuzhuang';
+                            //alert($('#zhuzhuang'));
+                            //alert(document.getElementById("zhuzhuang"));
+                            //divObj.setAttribute('id','zhuzhuang');
 
-            var divX = getMousePos()['x'];
+                            var divX = getMousePos()['x'];
 
-            var divY = getMousePos()['y'];
-            var only =  $("#only").val();
-            var w = 1000;
-            var h = 500;
-            if(only == "1"){
-                w = 360;
-                h = 400;
-            }
-            $(divObj).css({
-                'width': w,
-                'height': h,
+                            var divY = getMousePos()['y'];
+                            // var only =  $("#only").val();
+                            var w = 1000;
+                            var h = 500;
+                            // if(only == "1"){
+                            //     w = 360;
+                            //     h = 400;
+                            // }
+                            $(divObj).css({
+                                'width': w,
+                                'height': h,
 //              'border': '1px solid #ccc',
 //              'position': 'absolute',
 //              'top': 100,
 //              'left': 100
-            }).appendTo('.wrap');
-            // 创建柱状图
+                            }).appendTo('.wrap');
+                            // 创建柱状图
+                            var loadinglayer = layer.load(2, {
+                                shade: [0.3,'#fff'] //0.1透明度的白色背景
+                            });
+                            // 创建柱状图
+                            setwidth(e,divObj,index,loadinglayer);
+
+                            // zhuZhuangTu(e);
 
 
-            zhuZhuangTu(e);
-            var tanchutitle = "柱状图";
+                            // 点击遮挡层消失
+                            //clearWrap('.zhedang');
+                            //}
+                            //return;
+                        });
+                        function setlayer(index) {
+                            var tanchutitle = "柱状图";
+                            if(!index){
+                                index = layer.open({
+                                    type:1,
+                                    title:tanchutitle,
+                                    id:'lid1',
+                                    anim:1,
+                                    shade:0,
+                                    content:$('#zhuzhuang'),
+                                    // resize:false,
+                                    width:1000,
+                                    scrollbar: false,
+                                    cancel:function(){
 
-            if(!index){
-                index = layer.open({
-                    type:1,
-                    title:tanchutitle,
-                    id:'lid1',
-                    anim:1,
-                    shade:0,
-                    content:$('#zhuzhuang'),
-                   // resize:false,
-                    width:1000,
-                    scrollbar: false,
-                    cancel:function(){
-
-                        $('#zhuzhuang').remove();
-                        $('.layui-layer').remove();
-                        divObj = null;
-                        index = null;
-                    }
-                });
-            }
-            //layer.title(tanchutitle,index);
-            layer.style(index,{
-                backgroundColor: 'rgba(255,255,255,0.5)'
-            });
-            // 点击遮挡层消失
-            //clearWrap('.zhedang');
-            //}
-            //return;
-        });
-        // 获取横纵坐标
-        function getMousePos(e) {
-            var e = event || window.event;
-            var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
-            var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-            var x = e.pageX || e.clientX + scrollX;
-            var y = e.pageY || e.clientY + scrollY;
-            // console.log(x,y)
-            return {'x': x,'y': y};
-        };
-        // 生成柱状图
-        function zhuZhuangTu(e) {
-            //var zhuzhuang = echarts.init(divObj);
-
-            //从左下角起第lat列，第sat行
-            var column = e.data[0]
-            var row = e.data[1]
-            //var list = $("#list")
-            $.ajax({
-               // contentType:"application/json",
-                type:"POST",
-                url:"/map-one-zhu-sea",
-                //data:"list="+list+"column="+column+"row="+row,
-                data:{
-                    "column":column,
-                    "row":row,
-                },
-                traditional:true,
-                dataType:"json",
-                success:function (data) {
-                    var data1 = data.list1;
-                    var data2 = data.list2;
-                    var zhuzhuang= echarts.init(document.getElementById("zhuzhuang"));
-                    if(data.list1 == undefined) {
-                        var arr1 = new Array(data.length);
-                        var arr2 = new Array(data.length);
-                        for (var i = 0; i < data.length; i++) {
-                            arr1[i] = data[i].genus1
-                            //alert(arr1[i])
-                            arr2[i] = data[i].value
-                            //alert(arr2[i])
-                        }
-                    }else{
-                        var arr1 = new Array(data1.length+data2.length);
-                        var arr2 = new Array(data1.length+data2.length);
-                        for (var i = 0; i < data1.length; i++) {
-                            arr1[i] = data1[i].genus1
-                            //alert(arr1[i])
-                            arr2[i] = data1[i].value
-                            //alert(arr2[i])
-                        }
-                        for (var i = data1.length; i < (data1.length+data2.length); i++) {
-                            arr1[i] = data2[i-data1.length].genus1
-                            //alert(arr1[i])
-                            arr2[i] = data2[i-data1.length].value
-                            //alert(arr2[i])
-                        }
-                    }
-
-                    option = {
-                        backgroundColor: 'rgba(255,255,255,.3)',
-                        legend: {
-                           data:arr1
-                           // data: ['数据A','数据B','数据C','数据d','数据d']
-                        },
-                        xAxis: [
-                            {
-                                axisLabel:{
-                                    show:true,
-                                    interval:0,
-                                    rotate:40
-                                },
-                                type: 'category',
-                                data:arr1
-                                //data: ['数据A','数据B','数据C','数据d','数据d']
-                            },
-
-                        ],
-                        yAxis: [
-                            {
-                                splitLine: {
-                                    show: false
-                                },
-                                type: 'value'
+                                        $('#zhuzhuang').remove();
+                                        $('.layui-layer').remove();
+                                        divObj = null;
+                                        index = null;
+                                    }
+                                });
                             }
-                        ],
-                        series: [
-                            {
-                                type: 'bar',
-                                itemStyle: {
-                                    normal: {
-                                        color: function(params){
-                                            var colorList = ['#F75D5D','#59ED4F','#4C91E7','#5C3317','#5C4033','#238E23','#8E236B','#FF00FF','#871F78','#4F2F4F'];
-                                            return colorList[params.dataIndex];
-                                        },
-                                        label: {
-                                            show: true,
-                                            position: 'top',
-                                            textStyle: {
-                                                color: '#000'
+                            //layer.title(tanchutitle,index);
+                            layer.style(index,{
+                                backgroundColor: 'rgba(255,255,255,0.5)'
+                            });
+                        }
+                        function setwidth(e,divObj,index,loadinglayer) {
+                            //从左下角起第lat列，第sat行
+                            var column = e.data[0]
+                            var row = e.data[1]
+
+                            $.ajax({
+
+                                type:"POST",
+                                url: "/map-one-zhu-sea-wid",
+                                data:{
+                                    "column":column,
+                                    "row":row,
+                                    "city":city,
+                                    "country":country,
+                                    "funginame":funginame,
+                                    "datakind":datakind
+
+                                },
+                                traditional:true,
+                                dataType:"json",
+
+                                success:function (data){
+                                    var w = data.w
+                                    $(divObj).css({
+                                        'width': (w+1)*50,
+                                        'height': 500,
+
+                                    }).appendTo('.wrap');
+                                    var data1 = data.list1;//实际
+                                    var data2 = data.list2;//预测
+
+
+                                    var zhuzhuang= echarts.init(document.getElementById("zhuzhuang"));
+                                    //实际
+                                    if(data2 == "预测" ) {//预测
+                                        var arr1 = new Array(data1.length);
+                                        var arr2 = new Array(data1.length);
+                                        for (var i = 0; i < data1.length; i++) {
+                                            arr1[i] = data1[i].genus1
+                                            if(arr1[i].length == 0){
+                                                arr1[i] = data1[i].specialname
                                             }
+                                            //alert(arr1[i])
+                                            arr2[i] = data1[i].value
+                                            //alert(arr2[i])
+                                        }
+                                    }else if(data2 == "实际"){//实际
+                                        var arr1 = new Array(data1.length);
+                                        var arr2 = new Array(data1.length);
+
+                                        for (var i = 0; i < data1.length; i++) {
+
+
+                                            arr1[i] = data1[i].shorttext1567761455594
+                                            if(arr1[i].length == 0){
+                                                arr1[i] = data1[i].shorttext1567761353834
+                                            }
+                                            //alert(arr1[i])
+                                            arr2[i] = data1[i].value
+                                            //alert(arr2[i])
                                         }
                                     }
+                                    else{//两个情况
+                                        var arr1 = new Array(data1.length+data2.length);
+                                        var arr2 = new Array(data1.length+data2.length);
+                                        for (var i = 0; i < data1.length; i++) {
+                                            arr1[i] = data1[i].shorttext1567761455594
+                                            if(arr1[i].length == 0){
+                                                arr1[i] = data1[i].shorttext1567761353834
+                                            }
+                                            //alert(arr1[i])
+                                            arr2[i] = data1[i].value
+                                            //alert(arr2[i])
+                                        }
+                                        for (var i = data1.length; i < (data1.length+data2.length); i++) {
+                                            arr1[i] = data2[i-data1.length].genus1
+                                            if(arr1[i].length == 0){
+
+                                                arr1[i] = data2[i-data1.length].specialname
+                                            }
+                                            //alert(arr1[i])
+                                            arr2[i] = data2[i-data1.length].value
+                                            //alert(arr2[i])
+                                        }
+                                    }
+
+                                    option = {
+                                        backgroundColor: 'rgba(255,255,255,.3)',
+                                        // legend: {
+                                        //     data:arr1
+                                        //     // data: ['数据A','数据B','数据C','数据d','数据d']
+                                        // },
+                                        grid:{
+                                            x:45,
+                                            y:45,
+                                            x2:5,
+                                            y2:70,
+                                            borderWidth:1
+                                        },
+                                        xAxis: [
+                                            {
+                                                axisLabel:{
+                                                    show:true,
+                                                    interval:0,
+                                                    rotate:40
+                                                },
+                                                type: 'category',
+                                                data:arr1
+                                                //data: ['数据A','数据B','数据C','数据d','数据d']
+                                            },
+
+                                        ],
+                                        yAxis: [
+                                            {
+                                                splitLine: {
+                                                    show: false
+                                                },
+                                                type: 'value'
+                                            }
+                                        ],
+                                        series: [
+                                            {
+                                                type: 'bar',
+                                                itemStyle: {
+                                                    normal: {
+                                                        color: function(params){
+                                                            var colorList = ['#F75D5D','#59ED4F','#4C91E7','#5C3317','#5C4033','#238E23','#8E236B','#FF00FF','#871F78','#4F2F4F',
+                                                                '#D8D8BF','#CC3299','#4F2F4F','#CDCDCD','#5C4033','#ADEAEA','#D8BFD8','#DB9370','#38B0DE','#236B8E','#00FF7F',
+                                                                '#FF1CAE','#007FFF','#3299CC','#E6E8FA','#8E6B23','#6B4226','#238E68','#BC1717','#6F4242','#5959AB','#D9D9F3'
+                                                            ];
+                                                            return colorList[params.dataIndex];
+                                                        },
+                                                        label: {
+                                                            show: true,
+                                                            position: 'top',
+                                                            textStyle: {
+                                                                color: '#000'
+                                                            }
+                                                        }
+                                                    }
+                                                },
+
+                                                data:arr2
+                                                //data: [e.data[0],e.data[1],e.data[2]]
+                                            }
+                                        ]
+                                    };
+                                    zhuzhuang.setOption(option);
+                                    setlayer()
                                 },
-                                data:arr2
-                                //data: [e.data[0],e.data[1],e.data[2]]
+                                complete: function(XMLHttpRequest, textStatus) {
+                                    // zhuZhuangTu(e,divObj,index,loadinglayer);
+                                    layer.close(loadinglayer)
+                                },
+
+
+                            })
+                        }
+                        // 获取横纵坐标
+                        function getMousePos(e) {
+                            var e = event || window.event;
+                            var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+                            var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+                            var x = e.pageX || e.clientX + scrollX;
+                            var y = e.pageY || e.clientY + scrollY;
+                            // console.log(x,y)
+                            return {'x': x,'y': y};
+                        };
+                        // 生成柱状图
+                        function zhuZhuangTu(e,divObj,index,loadinglayer) {
+                            //var zhuzhuang = echarts.init(divObj);
+
+                            //从左下角起第lat列，第sat行
+                            var column = e.data[0]
+                            var row = e.data[1]
+                            //var list = $("#list")
+                            $.ajax({
+                                // contentType:"application/json",
+                                type:"POST",
+                                url:"/map-one-zhu-sea",
+                                //data:"list="+list+"column="+column+"row="+row,
+                                data:{
+                                    "column":column,
+                                    "row":row,
+                                    "city":city,
+                                    "country":country,
+                                    "funginame":funginame,
+                                    "datakind":datakind
+                                },
+                                traditional:true,
+                                dataType:"json",
+                                success:function (data) {
+                                    //当混合图时 list1为实际数据，list2为预测数据
+                                    //当为单一图时，list1为数据（有可能是任一种），list为当前数据类型
+                                    var data1 = data.list1;//实际
+                                    var data2 = data.list2;//预测
+
+
+                                    var zhuzhuang= echarts.init(document.getElementById("zhuzhuang"));
+                                    //实际
+                                    if(data2 == "预测" ) {//预测
+                                        var arr1 = new Array(data1.length);
+                                        var arr2 = new Array(data1.length);
+                                        for (var i = 0; i < data1.length; i++) {
+                                            arr1[i] = data1[i].genus1
+                                            //alert(arr1[i])
+                                            arr2[i] = data1[i].value
+                                            //alert(arr2[i])
+                                        }
+                                    }else if(data2 == "实际"){//实际
+                                        var arr1 = new Array(data1.length);
+                                        var arr2 = new Array(data1.length);
+
+                                        for (var i = 0; i < data1.length; i++) {
+
+
+                                            arr1[i] = data1[i].shorttext1567761455594
+                                            if(arr1[i].length == 0){
+                                                arr1[i] = data1[i].shorttext1567761353834
+                                            }
+                                            //alert(arr1[i])
+                                            arr2[i] = data1[i].value
+                                            //alert(arr2[i])
+                                        }
+                                    }
+                                    else{//两个情况
+                                        var arr1 = new Array(data1.length+data2.length);
+                                        var arr2 = new Array(data1.length+data2.length);
+                                        for (var i = 0; i < data1.length; i++) {
+                                            arr1[i] = data1[i].shorttext1567761455594
+                                            if(arr1[i].length == 0){
+                                                arr1[i] = data1[i].shorttext1567761353834
+                                            }
+                                            //alert(arr1[i])
+                                            arr2[i] = data1[i].value
+                                            //alert(arr2[i])
+                                        }
+                                        for (var i = data1.length; i < (data1.length+data2.length); i++) {
+                                            arr1[i] = data2[i-data1.length].genus1
+                                            //alert(arr1[i])
+                                            arr2[i] = data2[i-data1.length].value
+                                            //alert(arr2[i])
+                                        }
+                                    }
+
+                                    option = {
+                                        backgroundColor: 'rgba(255,255,255,.3)',
+                                        // legend: {
+                                        //     data:arr1
+                                        //     // data: ['数据A','数据B','数据C','数据d','数据d']
+                                        // },
+                                        grid:{
+                                            x:45,
+                                            y:45,
+                                            x2:5,
+                                            y2:70,
+                                            borderWidth:1
+                                        },
+                                        xAxis: [
+                                            {
+                                                axisLabel:{
+                                                    show:true,
+                                                    interval:0,
+                                                    rotate:40
+                                                },
+                                                type: 'category',
+                                                data:arr1
+                                                //data: ['数据A','数据B','数据C','数据d','数据d']
+                                            },
+
+                                        ],
+                                        yAxis: [
+                                            {
+                                                splitLine: {
+                                                    show: false
+                                                },
+                                                type: 'value'
+                                            }
+                                        ],
+                                        series: [
+                                            {
+                                                type: 'bar',
+                                                itemStyle: {
+                                                    normal: {
+                                                        color: function(params){
+                                                            var colorList = ['#F75D5D','#59ED4F','#4C91E7','#5C3317','#5C4033','#238E23','#8E236B','#FF00FF','#871F78','#4F2F4F',
+                                                                '#D8D8BF','#CC3299','#4F2F4F','#CDCDCD','#5C4033','#ADEAEA','#D8BFD8','#DB9370','#38B0DE','#236B8E','#00FF7F',
+                                                                '#FF1CAE','#007FFF','#3299CC','#E6E8FA','#8E6B23','#6B4226','#238E68','#BC1717','#6F4242','#5959AB','#D9D9F3'
+                                                            ];
+                                                            return colorList[params.dataIndex];
+                                                        },
+                                                        label: {
+                                                            show: true,
+                                                            position: 'top',
+                                                            textStyle: {
+                                                                color: '#000'
+                                                            }
+                                                        }
+                                                    }
+                                                },
+
+                                                data:arr2
+                                                //data: [e.data[0],e.data[1],e.data[2]]
+                                            }
+                                        ]
+                                    };
+                                    zhuzhuang.setOption(option);
+                                },
+                                complete: function(XMLHttpRequest, textStatus) {
+                                    setlayer(index);
+                                    layer.close(loadinglayer)
+                                },
+
+                            })
+
+
+                        }
+                        // 生成遮挡层
+                        function creatWrap(){
+                            var zheDang = document.createElement('div');
+                            $(zheDang).addClass('zhedang').css({
+                                width: '100%',
+                                height: '100%',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                backgroundColor: 'rgba(0,0,0,.2)'
+                            }).appendTo('.wrap');
+                        }
+                        // 去掉遮挡层
+                        function clearWrap(id){
+                            $(id).click(function(e){
+                                // console.log(this);
+                                this.remove();
+                                $('.tongJiTu').remove();
+                                return false;
+                            });
+                        }
+
+                        if (option && typeof option === "object") {
+                            myChart.setOption(option, true);
+                        }
+                        var bmap = myChart.getModel().getComponent('bmap').getBMap();
+                        var cityName =  $("#citycountry").val();
+                        var zoom =  $("#zoom").val();
+                        bmap.centerAndZoom(cityName,zoom);
+                        bmap.addControl(new BMap.OverviewMapControl());              //添加缩略地图控件
+                        bmap.enableScrollWheelZoom();
+                        bmap.addControl(new BMap.NavigationControl({ type: BMAP_NAVIGATION_CONTROL_LARGE ,anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMap.Size(40, 250)}));
+                        bmap.setMinZoom(8);
+                        bmap.setMaxZoom(20);
+                        var bdary = new BMap.Boundary();
+                        bdary.get(cityName, function (rs) {       //获取行政区域
+                            // bmap.clearOverlays();        //清除地图覆盖物
+
+                            //for循环都删除掉了，只剩下这个
+                            //网上查了下，东西经南北纬的范围
+                            var EN_JW = "180, 90;";         //东北角
+                            var NW_JW = "-180,  90;";       //西北角
+                            var WS_JW = "-180, -90;";       //西南角
+                            var SE_JW = "180, -90;";        //东南角
+                            //4.添加环形遮罩层
+                            var k =  0;
+                            if(cityName === "遵义市" || cityName === "黔东南苗族侗族自治州"){
+                                k = 1;
                             }
-                        ]
-                    };
-                    zhuzhuang.setOption(option);
-                }
+                            var ply1 = new BMap.Polygon(rs.boundaries[k] + SE_JW + SE_JW + WS_JW + NW_JW + EN_JW + SE_JW, { strokeColor: "none", fillColor: "rgb(246,246,246)", fillOpacity:1, strokeOpacity: 0.5 }); //建立多边形覆盖物
 
-            })
+                            bmap.addOverlay(ply1);
+                            //5. 给目标行政区划添加边框，其实就是给目标行政区划添加一个没有填充物的遮罩层
+                            var ply = new BMap.Polygon(rs.boundaries[k], { strokeWeight: 2, strokeColor: "#00f",fillColor: "" });
+                            bmap.addOverlay(ply);
+                            //map.setViewport(ply.getPath());    //调整视野
 
-
-        }
-        // 生成遮挡层
-        function creatWrap(){
-            var zheDang = document.createElement('div');
-            $(zheDang).addClass('zhedang').css({
-                width: '100%',
-                height: '100%',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                backgroundColor: 'rgba(0,0,0,.2)'
-            }).appendTo('.wrap');
-        }
-        // 去掉遮挡层
-        function clearWrap(id){
-            $(id).click(function(e){
-                // console.log(this);
-                this.remove();
-                $('.tongJiTu').remove();
-                return false;
-            });
-        }
-
-        if (option && typeof option === "object") {
-            myChart.setOption(option, true);
-        }
-        var bmap = myChart.getModel().getComponent('bmap').getBMap();
-        var cityName =  $("#citycountry").val();
-        var zoom =  $("#zoom").val();
-        bmap.centerAndZoom(cityName,zoom);
-        bmap.addControl(new BMap.OverviewMapControl());              //添加缩略地图控件
-        bmap.enableScrollWheelZoom();
-        bmap.addControl(new BMap.NavigationControl({ type: BMAP_NAVIGATION_CONTROL_LARGE ,anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMap.Size(40, 250)}));
-        bmap.setMinZoom(8);
-        bmap.setMaxZoom(20);
-        var bdary = new BMap.Boundary();
-        bdary.get(cityName, function (rs) {       //获取行政区域
-            // bmap.clearOverlays();        //清除地图覆盖物
-
-            //for循环都删除掉了，只剩下这个
-            //网上查了下，东西经南北纬的范围
-            var EN_JW = "180, 90;";         //东北角
-            var NW_JW = "-180,  90;";       //西北角
-            var WS_JW = "-180, -90;";       //西南角
-            var SE_JW = "180, -90;";        //东南角
-            //4.添加环形遮罩层
-            var k =  0;
-            if(cityName === "遵义市" || cityName === "黔东南苗族侗族自治州"){
-                k = 1;
+                        });
+                    }
+                })
             }
-            var ply1 = new BMap.Polygon(rs.boundaries[k] + SE_JW + SE_JW + WS_JW + NW_JW + EN_JW + SE_JW, { strokeColor: "none", fillColor: "rgb(246,246,246)", fillOpacity:1, strokeOpacity: 0.5 }); //建立多边形覆盖物
 
-            bmap.addOverlay(ply1);
-            //5. 给目标行政区划添加边框，其实就是给目标行政区划添加一个没有填充物的遮罩层
-            var ply = new BMap.Polygon(rs.boundaries[k], { strokeWeight: 2, strokeColor: "#00f",fillColor: "" });
-            bmap.addOverlay(ply);
-            //map.setViewport(ply.getPath());    //调整视野
+            load(myChart);
+        })
 
-        });
     });
 </script>
 
