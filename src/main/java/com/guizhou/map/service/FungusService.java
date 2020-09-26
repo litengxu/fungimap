@@ -6,6 +6,8 @@ import com.guizhou.map.domain.fungus;
 import java.util.*;
 
 public interface FungusService {
+    List<fungus> selectBySpecificname(String name);
+    fungus findbyobjectid(String objectid);
     Map listtoarrmap(List<fungus> list);
     List<fungus> getAllFungi();
     List<fungus> find30Fungi(List<fungus> list);

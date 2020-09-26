@@ -34,6 +34,15 @@ public class PredictServiceImpl implements PredictService{
     private predictMapper predictMapper;
 
     @Override
+    public List<predict> selectByspecialname(String specialname) {
+        //System.out.println("执行这里，说明缓存中读取不到数据，直接读取数据库....byname");
+        predictExample example = new predictExample();
+        predictExample.Criteria criteria = example.createCriteria();
+        criteria.andGenus1EqualTo(specialname);
+        return predictMapper.selectByExample(example);
+    }
+
+    @Override
     public Map listtoarrmap(List<predict> list) {
         int  n =list.size();
         //id数组
@@ -355,17 +364,37 @@ public class PredictServiceImpl implements PredictService{
                                 list2.get(j).setValue(String.valueOf(m));
                                 break;
                             }
+                        }else{
+                            if(list2.get(j).getSpecialname().equals(list.get(i).getGenus1())){
+                                flag = 0;
+                                int m1 = Integer.parseInt(list2.get(j).getValue());
+                                int m2 = Integer.parseInt(list.get(i).getValue());
+                                int m = m1+m2;
+                                list2.get(j).setValue(String.valueOf(m));
+                                break;
+                            }
                         }
                     }
                 }else {
                     for (int j = 0; j < list2.size(); j++) {
-                        if (list.get(i).getGenus1().equals(list2.get(j).getGenus1())) {
-                            flag = 0;
-                            int m1 = Integer.parseInt(list2.get(j).getValue());
-                            int m2 = Integer.parseInt(list.get(i).getValue());
-                            int m = m1+m2;
-                            list2.get(j).setValue(String.valueOf(m));
-                            break;
+                        if (list2.get(j).getGenus1().length() != 0) {
+                            if (list.get(i).getGenus1().equals(list2.get(j).getGenus1())) {
+                                flag = 0;
+                                int m1 = Integer.parseInt(list2.get(j).getValue());
+                                int m2 = Integer.parseInt(list.get(i).getValue());
+                                int m = m1 + m2;
+                                list2.get(j).setValue(String.valueOf(m));
+                                break;
+                            }
+                        }else{
+                            if (list.get(i).getGenus1().equals(list2.get(j).getSpecialname())) {
+                                flag = 0;
+                                int m1 = Integer.parseInt(list2.get(j).getValue());
+                                int m2 = Integer.parseInt(list.get(i).getValue());
+                                int m = m1 + m2;
+                                list2.get(j).setValue(String.valueOf(m));
+                                break;
+                            }
                         }
                     }
                 }

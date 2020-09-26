@@ -29,6 +29,24 @@ public class FungusServiceImpl implements FungusService{
     private double latitudemax = 29.443776;
     private double latitudemin = 24.191224;
     private  int size = 40;
+
+    @Override
+    public List<fungus> selectBySpecificname(String name) {
+        fungusExample example = new fungusExample();
+        fungusExample.Criteria criteria = example.createCriteria();
+        criteria.andShorttext1567761455594EqualTo(name);
+        List<fungus> list = fungusMapper.selectByExample(example);
+        return list;
+    }
+
+    @Override
+    public fungus findbyobjectid(String objectid) {
+        fungusExample example = new fungusExample();
+        fungusExample.Criteria criteria = example.createCriteria();
+        criteria.andIdEqualTo(objectid);
+        return fungusMapper.selectByExample(example).get(0);
+
+    }
     @Override
     public Map listtoarrmap(List<fungus> list) {
        int  n =list.size();
@@ -225,9 +243,17 @@ public class FungusServiceImpl implements FungusService{
             if(g1 == row && g2 == column) {
                 int flag = 1;
                 for(int j=0;j<list2.size();j++){
-                    if(list.get(i).getShorttext1567761455594().length() == 0){//当属为空时
-                        if(list2.get(j).getShorttext1567761455594().length() == 0){
-                            if(list.get(i).getShorttext1567761353834().equals(list2.get(j).getShorttext1567761353834())){
+                    if(list.get(i).getShorttext1567761455594().length() != 0){//当属为空时
+                        if(list2.get(j).getShorttext1567761455594().length() != 0) {
+                            if (list.get(i).getShorttext1567761455594().equals(list2.get(j).getShorttext1567761455594())) {
+                                flag = 0;
+                                int m1 = list2.get(j).getValue();
+                                int m2 = list.get(i).getValue();
+                                list2.get(j).setValue(m1 + m2);
+                                break;
+                            }
+                        }else{
+                            if (list.get(i).getShorttext1567761455594().equals(list2.get(j).getShorttext1567761353834())) {
                                 flag = 0;
                                 int m1 = list2.get(j).getValue();
                                 int m2 = list.get(i).getValue();
@@ -235,14 +261,28 @@ public class FungusServiceImpl implements FungusService{
                                 break;
                             }
                         }
+
+
                     }
                     else {
-                        if (list.get(i).getShorttext1567761455594().equals(list2.get(j).getShorttext1567761455594())) {
-                            flag = 0;
-                            int m1 = list2.get(j).getValue();
-                            int m2 = list.get(i).getValue();
-                            list2.get(j).setValue(m1 + m2);
-                            break;
+
+                        if(list2.get(j).getShorttext1567761455594().length() == 0){//当缓存结果中的属也为空时
+                            //比较菌种名称是否相同
+                            if(list.get(i).getShorttext1567761353834().equals(list2.get(j).getShorttext1567761353834())){
+                                flag = 0;
+                                int m1 = list2.get(j).getValue();
+                                int m2 = list.get(i).getValue();
+                                list2.get(j).setValue(m1 + m2);
+                                break;
+                            }
+                        }else{
+                            if(list.get(i).getShorttext1567761353834().equals(list2.get(j).getShorttext1567761455594())){
+                                flag = 0;
+                                int m1 = list2.get(j).getValue();
+                                int m2 = list.get(i).getValue();
+                                list2.get(j).setValue(m1 + m2);
+                                break;
+                            }
                         }
                     }
                 }

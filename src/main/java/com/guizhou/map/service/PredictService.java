@@ -4,6 +4,7 @@ import com.guizhou.map.domain.fungus;
 import com.guizhou.map.domain.predict;
 import java.util.*;
 public interface PredictService {
+    List<predict> selectByspecialname(String genus);
     Map listtoarrmap(List<predict> list);
     List<predict> getAllFungi();
     List<predict> selectByname(String genus);

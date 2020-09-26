@@ -1,33 +1,84 @@
 select{
     /* 去掉三角 */
     margin-left: 10px;
-    margin-top: 15px;
+    margin-top: 2px;
     appearance: none;
     -moz-appearance: none; /* Firefox */
     -webkit-appearance: none; /* Safari 和 Chrome */
     /* 去掉边框 */
     border: 1px solid #5cb85c;
-    width: 13%;
-    height: 34px; display : block;
+    width: 15.6%;
+    height: 37px; display : block;
     position: relative;
     float: left;
     display: block;
 }
 .layui-btn{
-    margin-top: 15px;
+    margin-top: 2px;
     margin-left: 10px;
-    width: 13%;
-    height: 34px;
+    width: 15.6%;
+    height: 37px;
+    /*position: relative;*/
 }
 #kk{
-    margin-top: 55px;
+    margin-top: 70px;
 }
 #iframee{
     margin-top: 60px;
 }
+#qita{
+    float: left;
+}
 #formid{
     width: 100%;
+
 }
 #left{
+    margin-top: 30px;
+    height: 40px;
     width: 100%;
 }
+#topfirst_1{
+    font-size: 25px;
+
+    margin-top: 20px;
+}
+#topfirst{
+    margin-left: 10px;
+    font-size: 25px;
+
+    margin-top: 20px;
+}
+
+#toptwo{
+    margin-left: 10px;
+    font-size: 25px;
+
+    margin-top: 20px;
+}
+#topthree{
+    margin-left: 10px;
+    font-size: 25px;
+
+    margin-top: 20px;
+}
+#topfour{
+    margin-left: 10px;
+    font-size: 25px;
+
+    margin-top: 20px;
+}
+
+#topfirstspan{
+    width: 100%;
+    margin-left: 15%;
+}
+#layui-headerid{
+    height: 70px;
+}
+#layui-logo-id{
+    margin-top: 0px;
+    /*text-align: unset;*/
+    line-height: 33px;
+}
+

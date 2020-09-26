@@ -10,7 +10,7 @@
            <link rel="stylesheet" href="/layui/css/layui.css"/>
            <script type="text/javascript" src="/layui/layui.js"></script>
            <script type="text/javascript" src="/js/jquery-3.1.1.min.js"></script>
-           <script type="text/javascript" src="/js/echarts.js"></script>
+           <script type="text/javascript" src="/js/echarts.min.js"></script>
            <script type="text/javascript" src="/js/bmap.min.js"></script>
            <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=Xg3x1KqgrWNnFox4cGPW739h0Bt6rab1&__ec_v__=20190126"></script>
        <input id="citycountry" type="hidden" th:value="${citycountry}">
@@ -152,7 +152,7 @@
                             // ];
                             option = {
                                 title: {
-                                    text: '菌种分布图',
+                                    text: '菌物种类分布图',
 
                                     left: 'center'
                                 },
@@ -191,27 +191,7 @@
                                     //	            opacity: 0.7
                                     //	        }
                                 },
-                                toolbox: {
-                                    show: true,
-                                    orient: 'vertical',
-                                    top: 'center',
-                                    feature: {
-                                        mark: {
-                                            show: true
-                                        },
-                                        dataView: {
-                                            show: true,
-                                            readOnly: true
-                                        },
-                                        restore: {
-                                            show: true
-                                        },
-                                        saveAsImage: {
-                                            show: true
-                                        }
-                                    }
 
-                                },
                                 bmap: {
                                     center: [106.630905, 26.670379],
                                     zoom: 8,
@@ -353,9 +333,45 @@
                                         },
                                         dataType: "json",
                                         success: function (data) {
+                                            var imgurl  = data.img;
+                                            var img = JSON.parse(imgurl);
+
                                             layer.photos({
-                                                photos: data,
+                                                photos: img,
                                                 anim: 5
+                                            });
+
+
+                                            //多窗口模式，层叠置顶
+                                            layer.open({
+                                                type: 1 //此处以iframe举例
+                                                ,title: '当前'+data.name+'详细情况'
+                                                ,area: ['390px', '330px']
+                                                ,shade: 0
+                                                ,offset: 'r'
+                                                ,maxmin: true
+                                                ,content: "&emsp;&emsp;"+ data.name+" <br/><br/> "+"&emsp;&emsp;"+ data.jie+" <br/><br/> "+
+                                                "&emsp;&emsp;"+data.men+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+data.gang+" <br/><br/>  "+ "&emsp;&emsp;"+data.mu+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+data.ke +" <br/><br/>  "+"&emsp;&emsp;"+ data.shu+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+ data.location+" <br/><br/> "+ "&emsp;&emsp;"+data.aspect+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+data.habit+" <br/><br/>  "+ "&emsp;&emsp;"+data.ecological+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+data.base_material +" <br/><br/>  "+"&emsp;&emsp;"+ data.interference+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+ data.nutrition_type+" <br/><br/> "+ "&emsp;&emsp;"+data.vegetation+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+data.trees+" <br/><br/>  "+
+                                                "&emsp;&emsp;"+data.economic_value +" <br/><br/>  "+"&emsp;&emsp;"+ data.describe
+                                                ,btn: ['全部关闭'] //只是为了演示
+                                                // ,yes: function(){
+                                                //     $(that).click(); //此处只是为了演示，实际使用可以剔除
+                                                // }
+                                                ,yes: function(){
+                                                    layer.closeAll();
+                                                }
+
+                                                ,zIndex: layer.zIndex //重点1
+                                                ,success: function(layero){
+                                                    layer.setTop(layero); //重点2
+                                                }
                                             });
                                         }
                                     })

@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="/layui/css/layui.css"/>
 <script type="text/javascript" src="/layui/layui.js"></script>
 <script type="text/javascript" src="/js/jquery-3.1.1.min.js"></script>
-<script type="text/javascript" src="/js/echarts.js"></script>
+<script type="text/javascript" src="/js/echarts.min.js"></script>
 <script type="text/javascript" src="/js/bmap.min.js"></script>
 <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=Xg3x1KqgrWNnFox4cGPW739h0Bt6rab1&__ec_v__=20190126"></script>
 <script type="text/javascript" th:inline="none">
@@ -131,7 +131,7 @@
                         option = {
 
                             title: {
-                                text: '菌种分布图',
+                                text: '菌物种类分布图',
 
                                 left: 'center'
                             },
@@ -151,27 +151,7 @@
 
 
                             },
-                            toolbox:{
-                                show:true,
-                                orient:'vertical',
-                                top:'center',
-                                feature:{
-                                    mark:{
-                                        show:true
-                                    },
-                                    dataView:{
-                                        show:true,
-                                        readOnly:true
-                                    },
-                                    restore:{
-                                        show:true
-                                    },
-                                    saveAsImage:{
-                                        show:true
-                                    }
-                                }
 
-                            },
                             series: [
                                 {
                                     type: 'custom',

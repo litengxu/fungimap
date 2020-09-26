@@ -20,9 +20,9 @@ function setSecond(value){
         sec.options.length=0; //清空二级菜单项
         sec.options[0] = new Option("所有地区","all");
         sec.options[1] = new Option("六枝特区","六枝特区");
-        sec.options[2] = new Option("水城县","水城县");
-        sec.options[3] = new Option("盘州市","盘州市");
-        sec.options[4] = new Option("钟山区","钟山区");
+        // sec.options[2] = new Option("水城县","水城县");
+        sec.options[2] = new Option("盘州市","盘州市");
+        sec.options[3] = new Option("钟山区","钟山区");
 
     } else if (val == "遵义市"){   //遵义
         var sec = document.getElementById('country');

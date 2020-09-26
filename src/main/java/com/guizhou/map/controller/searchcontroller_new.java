@@ -426,10 +426,12 @@ public class searchcontroller_new {
         String longitude = longitude1;
         String latitude = latitude1;
         String Objectid = objectid;
+        fungus fungus = new fungus();
 //        List<coordinatetoimgid> list1 = coordinatetoimgidService.getall();
 //        String Objectid = coordinatetoimgidService.findObjectidbycoor(list1, longitude, latitude);
         List<idtoimg> list3 = new ArrayList<>();
         List<idtoimg> list2 = IdtoimgService.getall();
+
         if (Objectid.equals("预测")) {//说明显示的图片是预测数据，找到对应的属，再去找这个属的图片
 //            List<predict> listp = predictService.getAllFungi();
 //            for (int i = 0; i < listp.size(); i++) {
@@ -450,33 +452,46 @@ public class searchcontroller_new {
 //            }
             List<fungus> listf = fungusService.getAllFungi();
             for (int i = 0; i <listf.size() ; i++) {
+                //先查属
                 if(listf.get(i).getShorttext1567761455594().equals(name)){
+
                     Objectid = listf.get(i).getId();
+
                     list3 = IdtoimgService.findbybizObjectid(list2, Objectid);
                     if(list3.size()>0){
+
+                        fungus = fungusService.findbyobjectid(Objectid);
+
                         break;
                     }
 
                 }
+                //属查不到时，查真实的菌种名称
                 if(list3.size() == 0){
                     if(listf.get(i).getShorttext1567761353834().equals(name)){
+
                         Objectid = listf.get(i).getId();
+
                         list3 = IdtoimgService.findbybizObjectid(list2, Objectid);
                         if(list3.size()>0){
+
+                            fungus = fungusService.findbyobjectid(Objectid);;
+
                             break;
                         }
                     }
                 }
             }
 
-            
 
         }else{
+            fungus = fungusService.findbyobjectid(objectid);
+
             list3 = IdtoimgService.findbybizObjectid(list2, Objectid);
         }
 
 
-        return IdtoimgService.createImgJson(list3,name);
+        return IdtoimgService.createImgJson(list3,fungus,name);
     }
 
 }

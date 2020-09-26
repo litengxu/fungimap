@@ -12,92 +12,135 @@
 </head>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
-    <li class="layui-header">
-        <div class="layui-logo">菌种分布布局</div>
+
+
+
+    <li class="layui-header" id="layui-headerid">
+        <div class="top" id="topfirstspan">
+            <span class="layui-breadcrumb" lay-separator=" " >
+
+                      <a id ="topfirst_1"></a>
+                        <span class="layui-badge-dot layui-bg-green"></span>
+                      <a id ="topfirst" href="http://www.efungus.gzbdi.com/#/" target="_blank">贵州省菌物资源云平台</a>
+                       <span class="layui-badge-dot layui-bg-green"></span>>
+                      <a id ="toptwo"href="http://datav.aliyuncs.com/share/a9d1b311041aea932b3d0b1bcc10a5bd" target="_blank">菌类资源普查工作动态</a>
+                       <span class="layui-badge-dot layui-bg-green"></span>
+                      <a id ="topthree" href="https://datav.aliyuncs.com/share/6d7d9e305d98ac033ba57c27f631d14d" target="_blank">优势菌种及保育区展示</a>
+                       <span class="layui-badge-dot layui-bg-green"></span>
+                      <a id ="topfour" href="http://datav.aliyuncs.com/share/61dd47549fa50d837b8c8aef79a04543" target="_blank">大型菌类调查信息</a>
+
+          </span>
+        </div>
+
+        <div class="layui-logo" id="layui-logo-id" style="font-size: 25px">菌种分布可视化与预测</div>
         <!-- 头部区域（可配合layui已有的水平导航） -->
         <ul class="layui-nav layui-layout-left" id="left">
 
+            <div class="layui-row layui-col-space1">
 
+                <!--<div class="layui-col-md1 ">-->
+
+                <!--<li class="layui-nav-item">-->
+                <!--&lt;!&ndash;<span class="layui-badge" id="qitaspan">4</span>&ndash;&gt;-->
+                <!--<span class="layui-badge-dot"></span>-->
+                <!--<a href="javascript:;">其它系统</a>-->
+                <!--<dl class="layui-nav-child">-->
+                <!--<dd><a href="http://www.efungus.gzbdi.com/#/" target="_blank">贵州省菌物资源云平台</a></dd>-->
+                <!--<dd><a href="http://datav.aliyuncs.com/share/a9d1b311041aea932b3d0b1bcc10a5bd" target="_blank">菌类资源普查工作动态</a></dd>-->
+                <!--<dd><a href="https://datav.aliyuncs.com/share/6d7d9e305d98ac033ba57c27f631d14d" target="_blank">优势菌种及保育区展示</a></dd>-->
+                <!--<dd><a href="http://datav.aliyuncs.com/share/61dd47549fa50d837b8c8aef79a04543" target="_blank">大型菌类调查信息</a></dd>-->
+                <!--</dl>-->
+                <!--</li>-->
+                <!--</div>-->
+                <div class="layui-col-md10 ">
                     <form action="" id="formid">
                         <!--<div class="layui-form-item">-->
-                            <!--<div class="layui-input-inline">-->
-                                <select id="city" name="quiz1" onchange="setSecond(this.value)">
-                                    <option value="">请选择市</option>
-                                    <option value="贵阳地区">贵阳地区</option>
-                                    <option value="六盘水地区">六盘水地区</option>
-                                    <option value="遵义市">遵义市</option>
-                                    <option value="安顺地区">安顺地区</option>
-                                    <option value="毕节地区">毕节地区</option>
-                                    <option value="铜仁地区">铜仁地区</option>
-                                    <option value="黔西南布依族苗族自治州">黔西南布依族苗族自治州</option>
-                                    <option value="黔东南苗族侗族自治州">黔东南苗族侗族自治州</option>
-                                    <option value="黔南布依族苗族自治州">黔南布依族苗族自治州</option>
-                                </select>
-                            <!--</div>-->
+                        <!--<div class="layui-input-inline">-->
+                        <select id="city" name="quiz1" onchange="setSecond(this.value)">
+                            <option value="">请选择市</option>
+                            <option value="贵阳地区">贵阳地区</option>
+                            <option value="六盘水地区">六盘水地区</option>
+                            <option value="遵义市">遵义市</option>
+                            <option value="安顺地区">安顺地区</option>
+                            <option value="毕节地区">毕节地区</option>
+                            <option value="铜仁地区">铜仁地区</option>
+                            <option value="黔西南布依族苗族自治州">黔西南布依族苗族自治州</option>
+                            <option value="黔东南苗族侗族自治州">黔东南苗族侗族自治州</option>
+                            <option value="黔南布依族苗族自治州">黔南布依族苗族自治州</option>
+                        </select>
+                        <!--</div>-->
 
-                            <!--<div class="layui-input-inline">-->
-                                <select id="country" name="quiz2">
-                                    <option value="">请选择县</option>
-                                </select>
-                            <!--</div>-->
+                        <!--<div class="layui-input-inline">-->
+                        <select id="country" name="quiz2">
+                            <option value="">请选择县</option>
+                        </select>
+                        <!--</div>-->
 
-                            <!--<div class="layui-input-inline">-->
-                                <select id="data" name="quiz5" onchange="setkind(this.value)">
-                                    <option value="">请选择数据来源</option>
-                                    <option value="1">混合</option>
-                                    <option value="2">实际数据</option>
-                                    <option value="3">预测数据</option>
-                                </select>
-                            <!--</div>-->
+                        <!--<div class="layui-input-inline">-->
+                        <select id="data" name="quiz5" onchange="setkind(this.value)">
+                            <option value="">请选择数据来源</option>
+                            <option value="1">混合</option>
+                            <option value="2">实际数据</option>
+                            <option value="3">预测数据</option>
+                        </select>
+                        <!--</div>-->
 
-                            <!--<div class="layui-input-inline">-->
-                                <select id="Fungi" name="quiz3">
-                                    <option value="">请选择种类</option>
-                                </select>
-                            <!--</div>-->
+                        <!--<div class="layui-input-inline">-->
+                        <select id="Fungi" name="quiz3">
+                            <option value="">请选择种类</option>
+                        </select>
+                        <!--</div>-->
 
-                            <!--<div class="layui-input-inline">-->
-                                <select id="style" name="quiz4">
-                                    <option value="">请选择地图类型</option>
-                                    <option value="1">散点图</option>
-                                    <option value="2">分块图</option>
-                                </select>
-                            <!--</div>-->
+                        <!--<div class="layui-input-inline">-->
+                        <select id="style" name="quiz4">
+                            <option value="">请选择地图类型</option>
+                            <option value="1">散点图</option>
+                            <option value="2">分块图</option>
+                        </select>
+                        <!--</div>-->
 
 
 
                         <button type="submit" class="layui-btn" id="btn"   formtarget="voiceList" >搜索</button>
                         <!--</div>-->
+
                     </form>
+                </div>
+            </div>
 
 
 
-           、
+
+
+
             <!--<li class="layui-nav-item">-->
-                <!--<select id="first" onchange="setSecond(this.value)">-->
-                    <!--<option value="1">广西</option>-->
-                    <!--<option value="2">广东</option>-->
-                <!--</select>-->
+            <!--<select id="first" onchange="setSecond(this.value)">-->
+            <!--<option value="1">广西</option>-->
+            <!--<option value="2">广东</option>-->
+            <!--</select>-->
             <!--</li>-->
             <!--<li class="layui-nav-item">-->
-                <!--<select id="second">-->
+            <!--<select id="second">-->
             <!--</li>-->
             <!--</select>-->
+
         </ul>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item">
                 <!--<a href="javascript:;">-->
-                    <!--<img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
-                    <!--贤心-->
+                <!--<img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
+                <!--贤心-->
                 <!--</a>-->
                 <!--<dl class="layui-nav-child">-->
-                    <!--<dd><a href="">基本资料</a></dd>-->
-                    <!--<dd><a href="">安全设置</a></dd>-->
+                <!--<dd><a href="">基本资料</a></dd>-->
+                <!--<dd><a href="">安全设置</a></dd>-->
                 <!--</dl>-->
             </li>
             <!--<li class="layui-nav-item"><a href="">退了</a></li>-->
         </ul>
-    </div>
+    </li>
+
+</div>
 
     <div class="layui-side layui-bg-black">
         <div class="layui-side-scroll">
@@ -135,6 +178,14 @@
 
                     </dl>
                 </li>
+                <!--<li class="layui-nav-item">-->
+                    <!--<a href="javascript:;">外部链接</a>-->
+                    <!--<dl class="layui-nav-child">-->
+                        <!--<dd><a href="http://datav.aliyuncs.com/share/a9d1b311041aea932b3d0b1bcc10a5bd" target="_blank">菌类资源普查工作动态</a></dd>-->
+                        <!--<dd><a href="https://datav.aliyuncs.com/share/6d7d9e305d98ac033ba57c27f631d14d" target="_blank">优势菌种及保育区展示</a></dd>-->
+                        <!--<dd><a href="http://datav.aliyuncs.com/share/61dd47549fa50d837b8c8aef79a04543" target="_blank">大型菌类调查信息</a></dd>-->
+                    <!--</dl>-->
+                <!--</li>-->
 
             </ul>
         </div>

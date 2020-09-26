@@ -10,7 +10,7 @@
        <link rel="stylesheet" href="/layui/css/layui.css"/>
        <script type="text/javascript" src="/layui/layui.js"></script>
        <script type="text/javascript" src="/js/jquery-3.1.1.min.js"></script>
-       <script type="text/javascript" src="/js/echarts.js"></script>
+       <script type="text/javascript" src="/js/echarts.min.js"></script>
        <script type="text/javascript" src="/js/bmap.min.js"></script>
        <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=Xg3x1KqgrWNnFox4cGPW739h0Bt6rab1&__ec_v__=20190126"></script>
        <input id="funginame" type="hidden" th:value="${name}">
@@ -29,21 +29,62 @@
                     contentType:"application/json",
                     type:"GET",
                     url:"/oneScatter/"+funginame,
-                    dataType:"json",
+                    // dataType:"json",
+
                     success:function (data) {
+
+                        var idarr = data.idarr;
+
+                        var namearr = data.namearr;
+                        var shuarr = data.shuarr;
+                        var longitudearr = data.longitudearr;
+                        var latitudearr = data.latitudearr;
+                        var valuearr = data.valuearr;
+                        var namearr_p = data.namearr_p;
+                        var idarr_p = data.idarr_p;
+                        var shuarr_p = data.shuarr_p;
+                        var longitudearr_p = data.longitudearr_p;
+                        var latitudearr_p = data.latitudearr_p;
+                        var valuearr_p = data.valuearr_p;
                         var app = {};
                         var COLORS = ["#70b4eb" , "#1482e5","#1c3fbf", "#070093"];
                         option = null;
                         var servicedata=[];
-                        for(var i=0;i<data.length;i++){
+                        var fungidata = [];
+                        for (var i = 0; i < idarr.length; i++) {
 
                             var obj = new Object();
+                            //具体的名字
 
-                            obj.name = data[i].shorttext1567761455594 + data[i].shorttext1567761353834 ;
-                            obj.objectid = data[i].id;
-                            obj.value = [data[i].shorttext1567760963892,data[i].shorttext1567760966363,data[i].value];
-                            // obj.img = data[i].img;
+                            //属
+                            obj.name = shuarr[i] + namearr[i];
+                            obj.objectid = idarr[i];
+                            obj.value = [longitudearr[i],latitudearr[i],valuearr[i],1];
+                            // obj.name = data1[i].shorttext1567761455594 + data1[i].shorttext1567761353834;
+                            // obj.objectid = data1[i].id;
+                            // // obj.special_name = data1[i].shorttext1567761353834;
+                            // obj.value = [data1[i].shorttext1567760963892, data1[i].shorttext1567760966363, data1[i].value];
+                            // obj.img = data1[i].img;
                             servicedata[i] = obj;
+                        }
+                        for (var i = 0; i < shuarr_p.length; i++) {
+                            var obj = new Object();
+                            if(shuarr_p[i].length == 0){
+                                obj.name = shuarr_p[i]+namearr_p[i];
+                            }else {
+                                obj.name = shuarr_p[i];
+                            }
+                            obj.objectid = "预测"
+                            // obj.objectid = idarr[i];
+                            obj.value = [longitudearr_p[i],latitudearr_p[i],valuearr_p[i]];
+                            // var obj = new Object();
+                            // obj.name = data2[i].genus1;
+                            // obj.objectid = "预测"
+                            // obj.value = [data2[i].longitude, data2[i].latitude, data2[i].probability];
+                            // obj.img = data2[i].img;
+
+                            fungidata[i] = obj;
+
                         }
                         // var data = [
                         //     {
@@ -57,7 +98,7 @@
                         // ];
                         option = {
                             title: {
-                                text: '菌种分布图',
+                                text: '菌物种类分布图',
 
                                 left: 'center'
                             },
@@ -65,20 +106,30 @@
                                 trigger: 'item',
                                 show: true,
                                 // formatter: "名称:{b}<br />坐标:{c0}<br /> "
-                                formatter:function(params,val){
-                                    return "种类:"+params.name+"  经度:"+params.value[0]+"\n"+"纬度:"+params.value[1] +"\n"
+                                formatter: function (params, val) {
+                                    if (params.value.length == 3) {
+                                        return "种类:" + params.name + '</br>'
+                                            + "经度:" + params.value[0] + "\n" + "纬度:" + params.value[1] + "\n" + "</br>"
+                                            + "概率:" + params.value[2].substring(0, 5) + "%" + "</br>"
+                                    } else {
+                                        return "种类:" + params.name + '</br>'
+                                            + "经度:" + params.value[0] + "\n" + "纬度:" + params.value[1] + "\n" + "</br>"
+
+                                    }
+
                                 }
                             },
                             visualMap: {
+                                seriesIndex: 0,
                                 left: 'right',
                                 min: 0,
-                                max: 1,
+                                max: 100,
                                 inRange: {
                                     //color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-                                    color:COLORS,
-                                    opacity: 0.3
+                                    color: COLORS,
+                                    opacity: 0.6
                                 },
-                                text:['High','Low'],           // 文本，默认为数值文本
+                                text: ['100%', '0%'],           // 文本，默认为数值文本
                                 calculable: true
 
                                 //	        inRange: {
@@ -86,27 +137,7 @@
                                 //	            opacity: 0.7
                                 //	        }
                             },
-                            toolbox:{
-                                show:true,
-                                orient:'vertical',
-                                top:'center',
-                                feature:{
-                                    mark:{
-                                        show:true
-                                    },
-                                    dataView:{
-                                        show:true,
-                                        readOnly:true
-                                    },
-                                    restore:{
-                                        show:true
-                                    },
-                                    saveAsImage:{
-                                        show:true
-                                    }
-                                }
 
-                            },
                             bmap: {
                                 center: [106.630905, 26.670379],
                                 zoom: 8,
@@ -211,14 +242,19 @@
                                 //     }]
                                 // }
                             },
-                            series : [
+                            legend: {
+                                right: 10,
+                                data: ['预测数据', '实际数据']
+                            },
+                            series: [
                                 {
-                                    name: 'pm2.5',
+                                    name: '预测数据',
                                     type: 'scatter',
                                     coordinateSystem: 'bmap',
-                                    data: servicedata,
+                                    data: fungidata,
                                     symbolSize: function (val) {
-                                        return val[2]*10;
+
+                                        return val[2]/3;
                                     },
                                     label: {
                                         normal: {
@@ -230,17 +266,60 @@
                                             show: true
                                         }
                                     },
-                                    //          itemStyle: {
-                                    //              normal: {
-                                    //                  color: 'purple'
-                                    //              }
-                                    //          }
                                     itemStyle: {
+                                        normal: {
+                                            // shadowBlur: 10,
+                                            // shadowColor: 'rgba(25, 100, 150, 0.5)',
+                                            // shadowOffsetY: 5,
+                                            color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
+                                                offset: 0,
+                                                color: 'rgb(129, 227, 238)'
+                                            }, {
+                                                offset: 1,
+                                                color: 'rgb(25, 183, 207)'
+                                            }])
+                                        },
+                                    }
+                                },
+
+                                {
+                                    name: '实际数据',
+                                    type: 'scatter',
+                                    coordinateSystem: 'bmap',
+                                    data: servicedata,
+                                    symbolSize: function (val) {
+
+                                        return val[2] * 10;
+                                    },
+                                    label: {
+                                        normal: {
+                                            formatter: '{b}',
+                                            position: 'right',
+                                            show: false
+                                        },
+                                        emphasis: {
+                                            show: true
+                                        }
+                                    },
+                                    itemStyle: {
+                                        normal: {
+                                            // shadowBlur: 10,
+                                            // shadowColor: 'rgba(120, 36, 50, 0.5)',
+                                            // shadowOffsetY: 5,
+                                            color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
+                                                offset: 0,
+                                                color: 'rgb(251, 118, 123)'
+                                            }, {
+                                                offset: 1,
+                                                color: 'rgb(204, 46, 72)'
+                                            }])
+                                        },
                                         emphasis: {
                                             color: 'yellow'
                                         }
                                     },
                                 }
+
                                 //      {
                                 //          name: 'Top 5',
                                 //          type: 'effectScatter',
@@ -291,7 +370,7 @@
                                 $.ajax({
                                     contentType:"application/json",
                                     type:"GET",
-                                    url:"/getphotos_all",
+                                    url: "/getphotos",
                                     data:{
                                         "longitude":longitude,
                                         "latitude":latitude,
@@ -299,10 +378,48 @@
                                         "objectid":objectid
                                     },
                                     dataType:"json",
-                                    success:function (data) {
+                                    success: function (data) {
+                                        if(objectid != '预测'){
+                                            var imgurl  = data.img;
+                                            var img = JSON.parse(imgurl);
+                                        }
+
                                         layer.photos({
-                                            photos:data,
-                                            anim:5
+                                            photos: img,
+                                            anim: 5
+                                        });
+
+
+                                        //多窗口模式，层叠置顶
+                                        layer.open({
+                                            type: 1 //此处以iframe举例
+                                            ,title: '当前'+data.name+'详细情况'
+                                            ,area: ['390px', '330px']
+                                            ,shade: 0
+                                            ,offset: 'r'
+                                            ,maxmin: true
+                                            ,content: "&emsp;&emsp;"+ data.name+" <br/><br/> "+"&emsp;&emsp;"+ data.jie+" <br/><br/> "+
+                                            "&emsp;&emsp;"+data.men+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+data.gang+" <br/><br/>  "+ "&emsp;&emsp;"+data.mu+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+data.ke +" <br/><br/>  "+"&emsp;&emsp;"+ data.shu+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+ data.location+" <br/><br/> "+ "&emsp;&emsp;"+data.aspect+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+data.habit+" <br/><br/>  "+ "&emsp;&emsp;"+data.ecological+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+data.base_material +" <br/><br/>  "+"&emsp;&emsp;"+ data.interference+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+ data.nutrition_type+" <br/><br/> "+ "&emsp;&emsp;"+data.vegetation+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+data.trees+" <br/><br/>  "+
+                                            "&emsp;&emsp;"+data.economic_value +" <br/><br/>  "+"&emsp;&emsp;"+ data.describe
+                                            ,btn: ['全部关闭'] //只是为了演示
+                                            // ,yes: function(){
+                                            //     $(that).click(); //此处只是为了演示，实际使用可以剔除
+                                            // }
+                                            ,yes: function(){
+                                                layer.closeAll();
+                                            }
+
+                                            ,zIndex: layer.zIndex //重点1
+                                            ,success: function(layero){
+                                                layer.setTop(layero); //重点2
+                                            }
                                         });
                                     }
                                 })

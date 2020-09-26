@@ -38,8 +38,10 @@
 
         <!-- 指定我们要操作的表明和生成的javabean类名 -->
         <!--<table tableName="fungi" domainObjectName="Fungi" >-->
-        <!--<table tableName="igtgv_pjldc01dcb" domainObjectName="fungus" >-->
-        <table tableName="predict" domainObjectName="predict" >
+        <table tableName="igtgv_pjldc01dcb" domainObjectName="fungus" >
+            <columnOverride column="staffselector1567760753916" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="longtext1567762200825" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <!--<table tableName="predict" domainObjectName="predict" >-->
         </table>
 
     </context>

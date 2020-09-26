@@ -8,8 +8,10 @@ import com.guizhou.map.common.domain.baseconfig;
 import com.guizhou.map.domain.fungus;
 import com.guizhou.map.domain.idtoimg;
 //import com.guizhou.map.service.CoordinatetoimgidService;
+import com.guizhou.map.domain.predict;
 import com.guizhou.map.service.FungusService;
 import com.guizhou.map.service.IdtoimgService;
+import com.guizhou.map.service.PredictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,8 @@ public class admincontroller_new {
     private FungusService fungusService;
     @Autowired
     private IdtoimgService IdtoimgService;
+    @Autowired
+    private PredictService predictService;
 
      //柱状图传到前端的list
 //    List<fungus> listz = new ArrayList<>();
@@ -106,8 +110,26 @@ public class admincontroller_new {
     @RequestMapping("/oneScatter/{name}")
     @ResponseBody
     public Object getoneScaatterimpl(@PathVariable("name") String name) {
-        List<fungus> list = fungusService.selectByname(name);
-        return list;
+
+        List<fungus> list = fungusService.selectBySpecificname(name);
+
+        //由于预测数据中不知道30种数据的属，所以这里直接只查专有的名字
+//        List<predict> list2 = predictService.selectByname(name);
+        List<predict> list2 = predictService.selectByspecialname(name);
+
+//        List<predict> list2 = predictService.getAllFungi();
+        Map<Object, Object> twolist_p = new HashMap<>();
+        Map<Object, Object> twolist = new HashMap<>();
+        twolist = fungusService.listtoarrmap(list);
+        twolist_p = predictService.listtoarrmap(list2);
+        twolist.put("namearr_p",twolist_p.get("namearr_p"));
+        twolist.put("shuarr_p",twolist_p.get("shuarr_p"));
+        twolist.put("longitudearr_p",twolist_p.get("longitudearr_p"));
+        twolist.put("latitudearr_p",twolist_p.get("latitudearr_p"));
+        twolist.put("valuearr_p",twolist_p.get("valuearr_p"));
+//        twolist.put("list1", list);
+//        String twolist2 = JSON.toJSONString(twolist);
+        return twolist;
     }
 
     //单种类柱状图ajax接口
@@ -336,13 +358,27 @@ public class admincontroller_new {
     @RequestMapping(value = "/allScatter")
     @ResponseBody
     public Object allScatter() {
+//        List<fungus> list = fungusService.getAllFungi();
+//        Map<Object, Object> twolist = new HashMap<>();
+//        twolist = fungusService.listtoarrmap(list);
+////        twolist.put("list1", list);
+//
+////        String twolist2 = JSON.toJSONString(twolist);
+//
+//        return twolist;
         List<fungus> list = fungusService.getAllFungi();
+//        list = fungusService.find30Fungi(list);
+        List<predict> list2 = predictService.getAllFungi();
+//        list2 = predictService.find30Fungi(list2);
+        Map<Object, Object> twolist_p = new HashMap<>();
         Map<Object, Object> twolist = new HashMap<>();
         twolist = fungusService.listtoarrmap(list);
-//        twolist.put("list1", list);
-
-//        String twolist2 = JSON.toJSONString(twolist);
-
+        twolist_p = predictService.listtoarrmap(list2);
+        twolist.put("namearr_p",twolist_p.get("namearr_p"));
+        twolist.put("shuarr_p",twolist_p.get("shuarr_p"));
+        twolist.put("longitudearr_p",twolist_p.get("longitudearr_p"));
+        twolist.put("latitudearr_p",twolist_p.get("latitudearr_p"));
+        twolist.put("valuearr_p",twolist_p.get("valuearr_p"));
         return twolist;
     }
 
@@ -573,11 +609,17 @@ public class admincontroller_new {
     public Object ajax30Scatter() {
         List<fungus> list = fungusService.getAllFungi();
         list = fungusService.find30Fungi(list);
-
+        List<predict> list2 = predictService.getAllFungi();
+        list2 = predictService.find30Fungi(list2);
+        Map<Object, Object> twolist_p = new HashMap<>();
         Map<Object, Object> twolist = new HashMap<>();
         twolist = fungusService.listtoarrmap(list);
-//        twolist.put("list1", list);
-//        String twolist2 = JSON.toJSONString(twolist);
+        twolist_p = predictService.listtoarrmap(list2);
+        twolist.put("namearr_p",twolist_p.get("namearr_p"));
+        twolist.put("shuarr_p",twolist_p.get("shuarr_p"));
+        twolist.put("longitudearr_p",twolist_p.get("longitudearr_p"));
+        twolist.put("latitudearr_p",twolist_p.get("latitudearr_p"));
+        twolist.put("valuearr_p",twolist_p.get("valuearr_p"));
         return twolist;
     }
     //获取图片接口
